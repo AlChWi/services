@@ -19,6 +19,7 @@ class UserModel {
     var age: Int16
     var email: String
     var phone: String
+    var money: Decimal
     var image: UIImage?
     //MARK: -
     
@@ -45,6 +46,7 @@ class UserModel {
         self.age = entity.age
         self.email = email
         self.phone = phone
+        self.money = entity.money as Decimal? ?? 0.0
         if let image = UIImage(data: entity.image ?? Data()) {
             self.image = image
         }
@@ -66,6 +68,7 @@ class UserModel {
         self.age = age
         self.email = email
         self.phone = phone
+        self.money = 100000.0
         if let data = image, let uiImage = UIImage(data: data) {
             self.image = uiImage
         }

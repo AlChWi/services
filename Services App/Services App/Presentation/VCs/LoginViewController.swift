@@ -123,10 +123,10 @@ class LoginViewController: UIViewController, Instantiatable {
                 }
                 if let user = DataService.shared.findUser(withLogin: login, andPassword: password) {
                     if let client = user as? ClientModel {
-                        coordinator?.logIn(forRole: .client, withUser: client, fromModalScreen: nil)
+                        coordinator?.logIn(forRole: .client, withUser: client, fromModalScreen: nil, profession: nil)
                     }
                     if let provider = user as? ProviderModel {
-                        coordinator?.logIn(forRole: .provider, withUser: provider , fromModalScreen: nil)
+                        coordinator?.logIn(forRole: .provider, withUser: provider , fromModalScreen: nil, profession: provider.profession)
                     }
                 } else {
                     let alert = UIAlertController(title: "Sign In", message: "Wrong password", preferredStyle: .alert)

@@ -7,5 +7,7 @@ target 'Services App' do
 
   # Pods for Services App
   pod 'SnapKit', '~> 5.0.0'
+  pod 'CoreStore', '~> 7.0'
+
 
 end

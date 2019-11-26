@@ -54,6 +54,12 @@
 		88C75E952350B43200333CEB /* Services_App.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 88C75E932350B43200333CEB /* Services_App.xcdatamodeld */; };
 		88C75E972350B43B00333CEB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88C75E962350B43B00333CEB /* Assets.xcassets */; };
 		88C75E9A2350B43B00333CEB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 88C75E982350B43B00333CEB /* LaunchScreen.storyboard */; };
+		9BC536D6238AF65D00DB99D6 /* ProfessionEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC536D5238AF65D00DB99D6 /* ProfessionEntity.swift */; };
+		9BC536D8238AF70C00DB99D6 /* ServiceCategoryEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC536D7238AF70C00DB99D6 /* ServiceCategoryEntity.swift */; };
+		9BC536DA238B069B00DB99D6 /* ProfessionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC536D9238B069A00DB99D6 /* ProfessionModel.swift */; };
+		9BC536DC238B075F00DB99D6 /* ProfessionSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC536DB238B075F00DB99D6 /* ProfessionSelectionViewController.swift */; };
+		9BC536DE238B330000DB99D6 /* ServiceCategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC536DD238B330000DB99D6 /* ServiceCategoryModel.swift */; };
+		9BC536E0238B35B800DB99D6 /* CategorySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC536DF238B35B800DB99D6 /* CategorySelectionViewController.swift */; };
 		A7FACD6A65958E0D5DD0BE38 /* Pods_Services_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B3245F6131F91D3A09B344 /* Pods_Services_App.framework */; };
 /* End PBXBuildFile section */
 
@@ -108,6 +114,12 @@
 		88C75E962350B43B00333CEB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		88C75E992350B43B00333CEB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		88C75E9B2350B43B00333CEB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9BC536D5238AF65D00DB99D6 /* ProfessionEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfessionEntity.swift; sourceTree = "<group>"; };
+		9BC536D7238AF70C00DB99D6 /* ServiceCategoryEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCategoryEntity.swift; sourceTree = "<group>"; };
+		9BC536D9238B069A00DB99D6 /* ProfessionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfessionModel.swift; sourceTree = "<group>"; };
+		9BC536DB238B075F00DB99D6 /* ProfessionSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfessionSelectionViewController.swift; sourceTree = "<group>"; };
+		9BC536DD238B330000DB99D6 /* ServiceCategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCategoryModel.swift; sourceTree = "<group>"; };
+		9BC536DF238B35B800DB99D6 /* CategorySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySelectionViewController.swift; sourceTree = "<group>"; };
 		A399951566F409977376EB8D /* Pods-Services App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Services App.debug.xcconfig"; path = "Target Support Files/Pods-Services App/Pods-Services App.debug.xcconfig"; sourceTree = "<group>"; };
 		AEEA1FB9DF6C8BD12E94C0AE /* Pods-Services App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Services App.release.xcconfig"; path = "Target Support Files/Pods-Services App/Pods-Services App.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -137,6 +149,8 @@
 			isa = PBXGroup;
 			children = (
 				8840BF4D2350C23A004DE39B /* ServiceModel.swift */,
+				9BC536DD238B330000DB99D6 /* ServiceCategoryModel.swift */,
+				9BC536D9238B069A00DB99D6 /* ProfessionModel.swift */,
 				8840BF4F2350C246004DE39B /* ProviderModel.swift */,
 				8840BF512350C250004DE39B /* ClientModel.swift */,
 				888234B32354A35E00BC25E0 /* OrderModel.swift */,
@@ -150,6 +164,8 @@
 			children = (
 				8840BF572350C422004DE39B /* UserEntity.swift */,
 				8840BF592350C42E004DE39B /* ServiceEntity.swift */,
+				9BC536D5238AF65D00DB99D6 /* ProfessionEntity.swift */,
+				9BC536D7238AF70C00DB99D6 /* ServiceCategoryEntity.swift */,
 				8840BF5B2350C43C004DE39B /* ProviderEntity.swift */,
 				8840BF5D2350C451004DE39B /* ClientEntity.swift */,
 				8840BF802350E050004DE39B /* OrderEntity.swift */,
@@ -180,6 +196,8 @@
 			isa = PBXGroup;
 			children = (
 				8840BF692350D19A004DE39B /* LoginViewController.swift */,
+				9BC536DB238B075F00DB99D6 /* ProfessionSelectionViewController.swift */,
+				9BC536DF238B35B800DB99D6 /* CategorySelectionViewController.swift */,
 				8840BF6C2350D1C2004DE39B /* ChooseRoleViewController.swift */,
 				887F4241235883C80007FD0C /* ChooseDateViewController.swift */,
 				8840BF6E2350D1EC004DE39B /* EditProfileTableViewController.swift */,
@@ -433,6 +451,7 @@
 				8840BF502350C246004DE39B /* ProviderModel.swift in Sources */,
 				8840BF752350D273004DE39B /* MainTabBarController.swift in Sources */,
 				887F423F235876370007FD0C /* ServiceWithProviderTableViewCell.swift in Sources */,
+				9BC536DE238B330000DB99D6 /* ServiceCategoryModel.swift in Sources */,
 				887D90B0235738E6008B3617 /* ServiceTableViewCell.swift in Sources */,
 				8840BF4E2350C23A004DE39B /* ServiceModel.swift in Sources */,
 				8840BF582350C422004DE39B /* UserEntity.swift in Sources */,
@@ -442,23 +461,28 @@
 				8840BF662350C4D1004DE39B /* ClientCoordinator.swift in Sources */,
 				8840BF7D2350D3A8004DE39B /* MyServicesViewController.swift in Sources */,
 				88553D2F235DB54200D2B1BE /* SecondaryCoordinator.swift in Sources */,
+				9BC536DC238B075F00DB99D6 /* ProfessionSelectionViewController.swift in Sources */,
 				8840BF712350D20D004DE39B /* Instantiatable.swift in Sources */,
 				8840BF772350D2AD004DE39B /* CreateServiceTableViewController.swift in Sources */,
 				88C75E952350B43200333CEB /* Services_App.xcdatamodeld in Sources */,
 				8840BF832350E06E004DE39B /* Constants.swift in Sources */,
 				8840BF522350C250004DE39B /* ClientModel.swift in Sources */,
+				9BC536D8238AF70C00DB99D6 /* ServiceCategoryEntity.swift in Sources */,
 				885C5B7123560DBC00FAB4E9 /* UIImageView+extensions.swift in Sources */,
 				887F4242235883C80007FD0C /* ChooseDateViewController.swift in Sources */,
 				8840BF5E2350C451004DE39B /* ClientEntity.swift in Sources */,
 				8840BF5C2350C43C004DE39B /* ProviderEntity.swift in Sources */,
 				88C75E8B2350B43200333CEB /* AppDelegate.swift in Sources */,
 				8840BF7B2350D382004DE39B /* OrderedServicesViewController.swift in Sources */,
+				9BC536D6238AF65D00DB99D6 /* ProfessionEntity.swift in Sources */,
 				887D90B623573CEF008B3617 /* OrderTableViewCell.swift in Sources */,
+				9BC536E0238B35B800DB99D6 /* CategorySelectionViewController.swift in Sources */,
 				8840BF7F2350D3B8004DE39B /* AllServicesViewController.swift in Sources */,
 				88C75E8D2350B43200333CEB /* SceneDelegate.swift in Sources */,
 				8840BF542350C260004DE39B /* UserModel.swift in Sources */,
 				8840BF6A2350D19A004DE39B /* LoginViewController.swift in Sources */,
 				8840BF812350E050004DE39B /* OrderEntity.swift in Sources */,
+				9BC536DA238B069B00DB99D6 /* ProfessionModel.swift in Sources */,
 				888234B42354A35E00BC25E0 /* OrderModel.swift in Sources */,
 				8840BF732350D22E004DE39B /* UserProfileTableViewController.swift in Sources */,
 				8840BF632350C476004DE39B /* AppCoordinator.swift in Sources */,
@@ -544,7 +568,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -598,7 +622,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -616,6 +640,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7MSPFU2KV4;
 				INFOPLIST_FILE = "Services App/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -635,6 +660,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7MSPFU2KV4;
 				INFOPLIST_FILE = "Services App/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

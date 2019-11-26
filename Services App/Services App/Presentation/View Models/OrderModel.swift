@@ -12,7 +12,7 @@ import UIKit
 class OrderModel {
     
     //MARK: - PUBLIC VARIABLES
-    var date: Date
+    var startDate: Date
     var clientID: UUID
     var clientName: String?
     var clientPhoto: UIImage?
@@ -24,13 +24,13 @@ class OrderModel {
     
     //MARK: - INIT
     init?(fromEntity entity: OrderEntity) {
-        guard let date = entity.date,
+        guard let startDate = entity.startDate,
             let serviceName = entity.service?.name,
             let clientID = entity.client?.id,
-            let providerID = entity.provider?.id else {
+            let providerID = entity.service?.toProvider?.id else {
                 return nil
         }
-        self.date = date
+        self.startDate = startDate
 
         self.serviceName = serviceName
         self.clientName = "\(entity.client?.firstName ?? "") \(entity.client?.lastName ?? "")"
@@ -38,15 +38,15 @@ class OrderModel {
             self.clientPhoto = UIImage(data: data)
         }
         self.clientID = clientID
-        self.providerName = "\(entity.provider?.firstName ?? "") \(entity.provider?.lastName ?? "")"
-        if let data = entity.provider?.image {
+        self.providerName = "\(entity.service?.toProvider?.firstName ?? "") \(entity.service?.toProvider?.lastName ?? "")"
+        if let data = entity.service?.toProvider?.image {
             self.providerPhoto = UIImage(data: data)
         }
         self.providerID = providerID
     }
     
     init(date: Date, clientID: UUID, providerID: UUID, serviceName: String) {
-        self.date = date
+        self.startDate = date
         self.clientID = clientID
         self.providerID = providerID
         self.serviceName = serviceName

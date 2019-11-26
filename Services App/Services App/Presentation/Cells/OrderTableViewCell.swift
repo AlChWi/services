@@ -23,8 +23,10 @@ class OrderTableViewCell: UITableViewCell {
     @IBOutlet private weak var clientPhotoImageView: UIImageView!
     @IBOutlet private weak var providerNameLabel: UILabel!
     @IBOutlet private weak var clientNameLabel: UILabel!
-    @IBOutlet private weak var doneButton: UIButton!
+    @IBOutlet weak var doneButton: UIButton!
     @IBOutlet private weak var dateLabel: UILabel!
+    @IBOutlet weak var serviceCategoryLabel: UILabel!
+    @IBOutlet weak var servicePriceLabel: UILabel!
     //MARK: -
     
     //MARK: - WAEK PUBLIC VARIABLES
@@ -51,6 +53,9 @@ class OrderTableViewCell: UITableViewCell {
     //MARK: - PUBLIC METHODS
     func configure(forOrder order: OrderModel) {
         serviceNameLabel.text = order.serviceName
+        let service = try? ServiceEntity.find(serviceName: order.serviceName, serviceProviderID: order.providerID, context: DataService.shared.persistentContainer.viewContext)
+        serviceCategoryLabel.text = service?.category?.name
+        servicePriceLabel.text = "\(service?.pricePerHour ?? 0)$/h"
         if let image = order.providerPhoto {
             providerPhotoImageView.image = image
         } else {
@@ -65,7 +70,7 @@ class OrderTableViewCell: UITableViewCell {
         clientNameLabel.text = order.clientName
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "HH:mm"
-        dateLabel.text = dateFormatter.string(from: order.date)
+        dateLabel.text = dateFormatter.string(from: order.startDate)
     }
     
     func hideDoneButton() {

@@ -13,6 +13,8 @@ class ServiceTableViewCell: UITableViewCell {
     //MARK: - PRIVATE IBOUTLETS
     @IBOutlet private weak var serviceNameBackgroundView: UIView!
     @IBOutlet private weak var serviceNameLabel: UILabel!
+    @IBOutlet weak var serviceCategoryLabel: UILabel!
+    @IBOutlet weak var servicePriceLabel: UILabel!
     //MARK: -
     
     //MARK: - LIFECYCLE
@@ -32,6 +34,8 @@ class ServiceTableViewCell: UITableViewCell {
     //MARK: - PUBLIC METHODS
     func configure(forService service: ServiceModel) {
         serviceNameLabel.text = service.name
+        serviceCategoryLabel.text = service.category?.name
+        servicePriceLabel.text = "\(service.pricePerHour ?? 0)$"
     }
     //MARK: -
     

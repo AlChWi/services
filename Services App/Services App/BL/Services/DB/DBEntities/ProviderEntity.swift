@@ -12,20 +12,23 @@ import CoreData
 class ProviderEntity: UserEntity {
     
     //MARK: - CLASS METHODS
-    class func findOrCreate(_ user: UserModel, context: NSManagedObjectContext) throws -> ProviderEntity {
+    class func findOrCreate(_ user: UserModel, profession: ProfessionModel, context: NSManagedObjectContext) throws -> ProviderEntity {
         if let providerEntity = try? ProviderEntity.find(userId: user.id, context: context) {
             
             return providerEntity
         } else {
             let providerEntity = ProviderEntity(context: context)
+            let professionEntity = try ProfessionEntity.find(professionName: profession.name, context: context)
             providerEntity.id = user.id
             providerEntity.firstName = user.firstName
             providerEntity.lastName = user.lastName
             providerEntity.login = user.login
             providerEntity.password = user.password
             providerEntity.age = user.age
+            providerEntity.profession = professionEntity
             providerEntity.email = user.email
             providerEntity.phone = user.phone
+            providerEntity.money = user.money as NSDecimalNumber
             providerEntity.image = user.image?.jpegData(compressionQuality: 1)
 
             return providerEntity

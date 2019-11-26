@@ -10,6 +10,11 @@ import UIKit
 
 class EditProfileTableViewController: UITableViewController, Instantiatable {
     
+    private enum State {
+        case creating
+        case editing
+    }
+    
     //MARK: - PRIVATE IBOUTLETS
     @IBOutlet private weak var userPhotoImageView: UIImageView!
     @IBOutlet private weak var firstNameTextField: UITextField!
@@ -19,6 +24,7 @@ class EditProfileTableViewController: UITableViewController, Instantiatable {
     @IBOutlet private weak var phoneNumberTextField: UITextField!
     @IBOutlet private weak var loginTextField: UITextField!
     @IBOutlet private weak var passwordTextField: UITextField!
+    @IBOutlet weak var chooseProfessionButton: UIButton!
     //MARK: -
     
     //MARK: - WEAK PRIVATE VARIABLES
@@ -29,6 +35,8 @@ class EditProfileTableViewController: UITableViewController, Instantiatable {
     private var role: Role?
     private var rememberedLogin: String?
     private var rememberedPassword: String?
+    private var state: State = .creating
+    private var initialData: UserEntity?
     
     //MARK: - PRIVATE USER INFO VARIABLES
     private var photo: Data?
@@ -56,6 +64,7 @@ class EditProfileTableViewController: UITableViewController, Instantiatable {
     private var password: String {
         return passwordTextField.text ?? ""
     }
+    private var profession: ProfessionModel?
     //MARK: -
     
     private lazy var imageTap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
@@ -66,15 +75,32 @@ class EditProfileTableViewController: UITableViewController, Instantiatable {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard let _ = role else {
+        guard let role = role else {
             navigationController?.popViewController(animated: true)
             return
         }
-
+        
+        if role == .client {
+            chooseProfessionButton.isEnabled = false
+        }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(professionSelected(_:)), name: .professionSelected, object: nil)
         configureNavigationItem()
         enableDoneButtonIfSavePossible()
         fillRememberedCredentials()
         configureUserPhotoImageView()
+    }
+    @objc
+    func professionSelected(_ notidication: Notification) {
+        guard
+            let professionFromNotification = notidication.userInfo?["profession"] as? ProfessionModel else {
+                print("ERRRORRRR")
+                return
+        }
+        profession = professionFromNotification
+        chooseProfessionButton.setTitle(profession?.name, for: .normal)
+        print(profession?.name)
+        print(profession?.id)
     }
     //MARK: -
     
@@ -119,7 +145,7 @@ class EditProfileTableViewController: UITableViewController, Instantiatable {
     
     @discardableResult
     private func enableDoneButtonIfSavePossible() -> Bool {
-        if !firstName.isEmpty, !lastName.isEmpty, let age = age, age > 17, !email.isEmpty, !phoneNumber.isEmpty, !login.isEmpty, !password.isEmpty {
+        if !firstName.isEmpty, !lastName.isEmpty, let age = age, age > 17, !email.isEmpty, !phoneNumber.isEmpty, !login.isEmpty, !password.isEmpty, email.isValidEmail(), phoneNumber.isValidPhoneNumber(), phoneNumber.count > 4, phoneNumber.count < 20 {
             doneButton.isEnabled = true
             return true
         } else {
@@ -176,15 +202,24 @@ class EditProfileTableViewController: UITableViewController, Instantiatable {
             do {
                 let client = ClientModel(login: login, password: password, firstName: firstName, lastname: lastName, age: age, email: email, phone: phoneNumber, image: photo)
                 try DataService.shared.create(client: client)
-                coordinator?.logIn(forRole: role!, withUser: client, fromModalScreen: self)
+                coordinator?.logIn(forRole: role!, withUser: client, fromModalScreen: self, profession: nil)
             } catch {
                 print(error)
             }
         case .provider:
+            guard
+                let profession = profession else {
+                    let alert = UIAlertController(title: "Not enough info", message: "Choose your profession", preferredStyle: .alert)
+                    present(alert, animated: true)
+                    DispatchQueue.main.asyncAfter(deadline: .now()) {
+                        alert.dismiss(animated: true, completion: nil)
+                    }
+                    return
+            }
             do {
-                let provider = ProviderModel(login: login, password: password, firstName: firstName, lastname: lastName, age: age, email: email, phone: phoneNumber, image: photo)
-                try DataService.shared.create(provider: provider)
-                coordinator?.logIn(forRole: role!, withUser: provider, fromModalScreen: self)
+                let provider = ProviderModel(login: login, password: password, firstName: firstName, lastname: lastName, age: age, email: email, phone: phoneNumber, image: photo, profession: profession)
+                try DataService.shared.create(provider: provider, profession: profession)
+                coordinator?.logIn(forRole: role!, withUser: provider, fromModalScreen: self, profession: provider.profession)
             } catch {
                 print(error)
             }
@@ -262,6 +297,9 @@ class EditProfileTableViewController: UITableViewController, Instantiatable {
         }
         enableDoneButtonIfSavePossible()
     }
+    @IBAction func didTapChooseProfession(_ sender: UIButton) {
+        coordinator?.showProfessionSelection(navVC: self.navigationController!)
+    }
     //MARK: -
 }
 
@@ -276,3 +314,20 @@ extension EditProfileTableViewController: UINavigationControllerDelegate, UIImag
     }
 }
 //MARK: -
+
+
+extension String {
+     func isValidEmail() -> Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+
+        let emailPredicate = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailPredicate.evaluate(with: self)
+    }
+    
+    func isValidPhoneNumber() -> Bool {
+        let phoneRexEx = "^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$"
+        
+        let phonePredicate = NSPredicate(format: "SELF MATCHES %@", phoneRexEx)
+        return phonePredicate.evaluate(with: self)
+    }
+}

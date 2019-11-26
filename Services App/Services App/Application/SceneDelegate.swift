@@ -26,10 +26,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let _ = (scene as? UIWindowScene) else { return }
         if let user = coordinator.currentUser {
             if let _ = user as? ClientModel {
-                coordinator.logIn(forRole: .client, withUser: user, fromModalScreen: nil)
+                coordinator.logIn(forRole: .client, withUser: user, fromModalScreen: nil, profession: nil)
             }
-            if let _ = user as? ProviderModel {
-                coordinator.logIn(forRole: .provider, withUser: user, fromModalScreen: nil)
+            if let provider = user as? ProviderModel {
+                coordinator.logIn(forRole: .provider, withUser: user, fromModalScreen: nil, profession: provider.profession)
             }
         } else {
             coordinator.entryForNewUser()

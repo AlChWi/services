@@ -12,11 +12,12 @@ import UIKit
 protocol MainCoordinator: class {
     var currentUser: UserModel? { get set }
     var currentVC: UIViewController? { get }
+    var profession: ProfessionModel? { get set }
     
     func entryForNewUser()
     func logIn(forRole role: Role,
                withUser user: UserModel,
-               fromModalScreen vc: UIViewController?)
+               fromModalScreen vc: UIViewController?, profession: ProfessionModel?)
     func register(fromScreen viewController: UIViewController,
                   withLogin login: String?,
                   andPassword password: String?)
@@ -27,5 +28,7 @@ protocol MainCoordinator: class {
     func addService(fromScreen vc: UIViewController)
     func showServicesForClient(fromScreen vc: UIViewController)
     func chooseDate(forService service: ServiceModel, fromScreen vc: UIViewController)
+    func showProfessionSelection(navVC: UINavigationController)
+    func showCategorySelection(navVC: UINavigationController)
     func logOut()
 }

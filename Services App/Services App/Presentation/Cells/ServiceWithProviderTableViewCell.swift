@@ -15,6 +15,8 @@ class ServiceWithProviderTableViewCell: UITableViewCell {
     @IBOutlet private weak var serviceNameLabel: UILabel!
     @IBOutlet private weak var providerNameLabel: UILabel!
     @IBOutlet private weak var providerPhotoImageView: UIImageView!
+    @IBOutlet weak var serviceCategoryLabel: UILabel!
+    @IBOutlet weak var servicePriceLabel: UILabel!
     //MARL: -
     
     //MARK: - LIFECYCLE
@@ -37,6 +39,8 @@ class ServiceWithProviderTableViewCell: UITableViewCell {
     func configure(forService service: ServiceModel, andProvider provider: ProviderModel) {
         self.serviceNameLabel.text = service.name
         self.providerNameLabel.text = "\(provider.firstName) \(provider.lastName)"
+        self.serviceCategoryLabel.text = service.category?.name
+        self.servicePriceLabel.text = "\(service.pricePerHour ?? 0)$/h"
         if let image = provider.image {
             self.providerPhotoImageView.image = image
         } else {

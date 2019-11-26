@@ -16,14 +16,19 @@ class ServiceEntity: NSManagedObject {
         if let _ = try? ServiceEntity.find(serviceName: service.name, serviceProviderID: service.providerID, context: context) {
             throw ServiceCreationErrors.alreadyExisted
         } else {
-            print(service.providerID)
             guard let provider = DataService.shared.findUser(byID: service.providerID) as? ProviderEntity else {
                 throw ServiceCreationErrors.couldntFindUser
             }
+            let category = try ServiceCategoryEntity.find(categoryName: service.category?.name ?? "", context: context)
             let serviceEntity = ServiceEntity(context: context)
             serviceEntity.name = service.name
+            serviceEntity.category = category
+            serviceEntity.pricePerHour = service.pricePerHour! as NSDecimalNumber
             serviceEntity.toProvider = provider
 
+            print(serviceEntity.name)
+            print(serviceEntity.category)
+            print(serviceEntity.pricePerHour)
             print("service created")
             return serviceEntity
         }
@@ -35,6 +40,22 @@ class ServiceEntity: NSManagedObject {
         let fetchResult = try context.fetch(request)
             
         return fetchResult.first
+    }
+    
+    class func find(containingName name: String, context: NSManagedObjectContext) throws -> [ServiceEntity] {
+        let request: NSFetchRequest<ServiceEntity> = ServiceEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "name CONTAINS %@", argumentArray: [name])
+        let fetchResult = try context.fetch(request)
+        
+        return fetchResult
+    }
+    
+    class func find(forCategory categoryName: String, context: NSManagedObjectContext) throws -> [ServiceEntity] {
+        let request: NSFetchRequest<ServiceEntity> = ServiceEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "profession.name CONTAINS %@", argumentArray: [categoryName])
+        let fetchResult = try context.fetch(request)
+        
+        return fetchResult
     }
     
     class func findAll(context: NSManagedObjectContext) throws -> [ServiceEntity] {

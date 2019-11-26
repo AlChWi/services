@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import CoreStore
 
 class UserEntity: NSManagedObject {
     
@@ -27,6 +28,13 @@ class UserEntity: NSManagedObject {
         let fetchResult = try context.fetch(request)
             
         return fetchResult.first
+    }
+    
+    class func findWithMostMoney(inDataStack stack: DataStack) -> UserEntity? {
+        return try? stack.fetchOne(
+            From<UserEntity>()
+                .orderBy(.descending(\.money))
+        )
     }
     
     class func findWithLogin(login: String, context: NSManagedObjectContext) throws -> UserEntity? {

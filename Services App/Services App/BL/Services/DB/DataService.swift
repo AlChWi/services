@@ -8,10 +8,13 @@
 
 import Foundation
 import CoreData
+import CoreStore
 
 class DataService {
     
     static let shared = DataService()
+    let sharedCoreStore = DataStack(xcodeModelName: "Services_App")
+
     
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Services_App")
@@ -45,8 +48,8 @@ class DataService {
     }
     
     @discardableResult
-    func create(provider: ProviderModel) throws -> ProviderEntity {
-        let provider = try ProviderEntity.findOrCreate(provider, context: persistentContainer.viewContext)
+    func create(provider: ProviderModel, profession: ProfessionModel) throws -> ProviderEntity {
+        let provider = try ProviderEntity.findOrCreate(provider, profession: profession, context: persistentContainer.viewContext)
         if persistentContainer.viewContext.hasChanges {
             try persistentContainer.viewContext.save()
         }
@@ -188,7 +191,14 @@ class DataService {
     }
     
     private init() {
-        
+        try? sharedCoreStore.addStorage(SQLiteStore(fileName: "Services_App.sqlite"), completion: { (result) in
+            switch result {
+            case .failure(let error):
+                print(error)
+            case .success(let store):
+                return
+            }
+        })
     }
     
 }

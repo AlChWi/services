@@ -18,6 +18,7 @@ class AppCoordinator: MainCoordinator {
     //MARK: - PUBLIC VARIABLES
     private(set) var currentVC: UIViewController?
     var currentUser: UserModel?
+    var profession: ProfessionModel?
     //MARK: -
     
     //MARK: - PRIVATE VARIABLES
@@ -62,9 +63,12 @@ class AppCoordinator: MainCoordinator {
         vc.present(chooseDateVC, animated: true)
     }
     
-    func logIn(forRole role: Role, withUser user: UserModel, fromModalScreen modalVC: UIViewController?) {
+    func logIn(forRole role: Role, withUser user: UserModel, fromModalScreen modalVC: UIViewController?, profession: ProfessionModel?) {
         setCoordinatorStrategy: switch role {
         case .provider:
+            if let profession = profession {
+                self.profession = profession
+            }
             currentStrategy = ProviderCoordinator(coordinator: self)
         case .client:
             currentStrategy = ClientCoordinator(coordinator: self)
@@ -84,9 +88,22 @@ class AppCoordinator: MainCoordinator {
         }
     }
     
+    func showProfessionSelection(navVC: UINavigationController) {
+        let vc = ProfessionSelectionViewController()
+        vc.coordinator = self
+        navVC.pushViewController(vc, animated: true)
+    }
+    
+    func showCategorySelection(navVC: UINavigationController) {
+        let vc = CategorySelectionViewController()
+        vc.coordinator = self
+        navVC.pushViewController(vc, animated: true)
+    }
+    
     func logOut() {
         DataService.shared.logOut()
         currentUser = nil
+        profession = nil
         
         let loginScreen = LoginViewController.instantiate()
         loginScreen.setCoordinator(self)
@@ -129,8 +146,14 @@ class AppCoordinator: MainCoordinator {
         //MARK: - FIND LOGGED USER
         if let user = try? DataService.shared.getCurrentUser() {
             currentUser = user
+            if let user = user as? ProviderModel {
+                profession = user.profession
+            }
         }
         //MARK: -
+        let result = UserEntity.findWithMostMoney(inDataStack: DataService.shared.sharedCoreStore)
+        print(result?.money)
+
     }
     //MARK: -
 }

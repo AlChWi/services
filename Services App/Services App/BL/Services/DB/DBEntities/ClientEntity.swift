@@ -26,6 +26,7 @@ class ClientEntity: UserEntity {
             clientEntity.age = user.age
             clientEntity.email = user.email
             clientEntity.phone = user.phone
+            clientEntity.money = user.money as NSDecimalNumber
             clientEntity.image = user.image?.jpegData(compressionQuality: 1)
             
             return clientEntity

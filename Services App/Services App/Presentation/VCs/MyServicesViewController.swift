@@ -25,18 +25,37 @@ class MyServicesViewController: UIViewController, Instantiatable {
     
     //MARK: - PRIVATE LAZY VARIABLES
     private lazy var addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped))
+    private lazy var searchBarController = UISearchController(searchResultsController: nil)
     //MARK: -
     
     //MARK: - PRIVATE VARIABLES
     private var coordinator: MainCoordinator?
     private var services: [ServiceModel] = []
     private var refreshControl = UIRefreshControl()
+    
+    var filteredServices: [ServiceModel] = [] {
+        didSet {
+            myServicesTableView.reloadData()
+        }
+    }
+    var isSearchBarEmpty: Bool {
+        searchBarController.searchBar.text?.isEmpty ?? true
+    }
+    var isFiltering: Bool {
+        return searchBarController.isActive && !isSearchBarEmpty
+    }
     //MARK: -
         
     //MARK: - LIFECYCLE
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        navigationItem.searchController = searchBarController
+        searchBarController.searchResultsUpdater = self
+        searchBarController.obscuresBackgroundDuringPresentation = false
+        searchBarController.searchBar.placeholder = "Service name or category"
+        definesPresentationContext = true
+        
         configureNavigationItem()
         configureRefreshAndPrepareInfo()
         NotificationCenter.default.addObserver(self, selector: #selector(handleServiceCreated(_:)), name: .serviceCreated, object: nil)
@@ -89,24 +108,49 @@ class MyServicesViewController: UIViewController, Instantiatable {
 //MARK: - UITableViewDelegate, UITableViewDataSource
 extension MyServicesViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return services.count
+        return isFiltering == true ? filteredServices.count : services.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = myServicesTableView.dequeueReusableCell(withIdentifier: Constants.CellIDs.serviceCell, for: indexPath) as? ServiceTableViewCell
-        cell?.configure(forService: services[indexPath.row])
-        
+        if isFiltering {
+            cell?.configure(forService: filteredServices[indexPath.row])
+        } else {
+            cell?.configure(forService: services[indexPath.row])
+        }
         return cell ?? UITableViewCell()
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            try? DataService.shared.delete(service: services[indexPath.row])
-            services.remove(at: indexPath.row)
-            myServicesTableView.beginUpdates()
-            myServicesTableView.deleteRows(at: [indexPath], with: .automatic)
-            myServicesTableView.endUpdates()
+            if isFiltering {
+                try? DataService.shared.delete(service: filteredServices[indexPath.row])
+                services.removeAll { (service) -> Bool in
+                    return service.name == filteredServices[indexPath.row].name
+                }
+                filteredServices.remove(at: indexPath.row)
+            } else {
+                try? DataService.shared.delete(service: services[indexPath.row])
+                services.remove(at: indexPath.row)
+                myServicesTableView.beginUpdates()
+                myServicesTableView.deleteRows(at: [indexPath], with: .automatic)
+                myServicesTableView.endUpdates()
+            }
         }
     }
 }
 //MARK: -
+
+extension MyServicesViewController: UISearchResultsUpdating {
+     func updateSearchResults(for searchController: UISearchController) {
+        filterContentForSearchText(searchController.searchBar.text!)
+    }
+    
+    func filterContentForSearchText(_ searchText: String) {
+        filteredServices = services.filter({ (service) -> Bool in
+            return service.name.lowercased().contains(searchText.lowercased()) || service.category?.name.lowercased().contains(searchText.lowercased()) ?? false
+        })
+      
+      myServicesTableView.reloadData()
+    }
+}

@@ -16,10 +16,11 @@ class ChooseDateViewController: UIViewController, Instantiatable {
     @IBOutlet private weak var orderDatePicker: UIDatePicker! {
         didSet {
             orderDatePicker.datePickerMode = .dateAndTime
-            orderDatePicker.minimumDate = Calendar.current.date(bySettingHour: 8, minute: 0, second: 0, of: Date(timeIntervalSinceNow: 86400)) ?? Date()
+            orderDatePicker.minimumDate = Date(timeIntervalSinceNow: 3600)
         }
     }
     @IBOutlet private weak var instructionLabel: UILabel!
+    @IBOutlet weak var noteTextLabel: UILabel!
     @IBOutlet private weak var placeOrderButton: UIButton!
     @IBOutlet private weak var cancelOrderButton: UIButton!
     @IBOutlet private weak var tapView: UIView!
@@ -38,6 +39,9 @@ class ChooseDateViewController: UIViewController, Instantiatable {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        noteTextLabel.text! += "\n This service usually takes \(service?.category?.standardLength ?? 0) hours"
+
+        noteTextLabel.numberOfLines = 0
         configureVisualEffectBackground()
         configureDismissingTap()
     }
@@ -120,11 +124,11 @@ class ChooseDateViewController: UIViewController, Instantiatable {
         let order = OrderModel(date: orderDatePicker.date, clientID: clientID, providerID: providerID, serviceName: serviceName)
         
         //CAN'T CREATE ORDER IF PROVIDER HAS ANOTHER ORDERS WITHIN AN HOUR
-        FindOrdersWithinHour: if let id = service?.providerID,
+        if let id = service?.providerID,
             let otherOrders = try? DataService.shared.findOrders(forUserByID: id, date: orderDatePicker.date),
             !otherOrders.isEmpty {
             let alert = UIAlertController(title: "Date",
-                                          message: "This provider has another order within an hour. Please, choose another time",
+                                          message: "This provider has another order which time that intersects with this order. Please, choose another time",
                                           preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (action) in
                 alert?.dismiss(animated: true, completion: nil)
@@ -141,8 +145,8 @@ class ChooseDateViewController: UIViewController, Instantiatable {
         if let photo = orderEntity?.client?.image {
             order.clientPhoto = UIImage(data: photo)
         }
-        order.providerName = "\(orderEntity?.provider?.firstName ?? " ") \(orderEntity?.provider?.lastName ?? " ")"
-        if let photo = orderEntity?.provider?.image {
+        order.providerName = "\(orderEntity?.service?.toProvider?.firstName ?? " ") \(orderEntity?.service?.toProvider?.lastName ?? " ")"
+        if let photo = orderEntity?.service?.toProvider?.image {
             order.providerPhoto = UIImage(data: photo)
         }
         
@@ -162,7 +166,7 @@ class ChooseDateViewController: UIViewController, Instantiatable {
     @IBAction private func datePickerValueChanged(_ sender: UIDatePicker) {
         let chosenDate = sender.date
         let hour = Calendar.current.component(.hour, from: chosenDate)
-        if hour > 20 {
+        if hour >= 20 {
             sender.date = Calendar.current.date(bySettingHour: 20, minute: 0, second: 0, of: sender.date) ?? Date()
         }
         if hour < 8 {

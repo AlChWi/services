@@ -17,6 +17,8 @@ class UserProfileTableViewController: UITableViewController, Instantiatable {
     @IBOutlet private weak var userAgeLabel: UILabel!
     @IBOutlet private weak var userEmailLabel: UILabel!
     @IBOutlet private weak var userPhoneNumberLabel: UILabel!
+    @IBOutlet weak var userProfession: UILabel!
+    @IBOutlet weak var userMoneyLabel: UILabel!
     @IBOutlet private weak var logOutButton: UIButton!
     //MARK: -
     
@@ -37,11 +39,17 @@ class UserProfileTableViewController: UITableViewController, Instantiatable {
         super.viewWillAppear(animated)
         
         if let user = coordinator?.currentUser {
+            userMoneyLabel.text = "\(user.money)$"
             userFirstNameLabel.text = user.firstName
             userLastNameLabel.text = user.lastName
             userAgeLabel.text = "\(user.age)"
             userEmailLabel.text = user.email
             userPhoneNumberLabel.text = user.phone
+            if let profession = coordinator?.profession {
+                userProfession.text = profession.name
+            } else {
+                userProfession.text = "you are a client"
+            }
             
             if let image = user.image {
                 userPhotoImageView.image = image

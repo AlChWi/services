@@ -11,4 +11,6 @@ import Foundation
 extension Notification.Name {
     static let orderCreated = Notification.Name(Constants.NotificationNames.orderCreated)
     static let serviceCreated = Notification.Name(Constants.NotificationNames.serviceCreated)
+    static let professionSelected = Notification.Name("Profession selected")
+    static let categorySelected = Notification.Name("Category selected")
 }

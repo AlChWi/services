@@ -17,7 +17,7 @@ class OrderEntity: NSManagedObject {
             
             return orderEntity
         } else {
-            guard let provider = DataService.shared.findUser(byID: order.providerID) as? ProviderEntity, let client = DataService.shared.findUser(byID: order.clientID) as? ClientEntity else {
+            guard let _ = DataService.shared.findUser(byID: order.providerID) as? ProviderEntity, let client = DataService.shared.findUser(byID: order.clientID) as? ClientEntity else {
                 throw OrderCreationErrors.couldntFindUser
             }
             guard let service = try ServiceEntity.find(serviceName: order.serviceName, serviceProviderID: order.providerID, context: context) else {
@@ -25,9 +25,8 @@ class OrderEntity: NSManagedObject {
             }
             
             let orderEntity = OrderEntity(context: context)
-            orderEntity.date = order.date
+            orderEntity.startDate = order.startDate
             orderEntity.client = client
-            orderEntity.provider = provider
             orderEntity.service = service
             
             print("order created")
@@ -37,7 +36,7 @@ class OrderEntity: NSManagedObject {
     
     class func find(order: OrderModel, context: NSManagedObjectContext) throws -> OrderEntity? {
         let request: NSFetchRequest<OrderEntity> = OrderEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "date == %@ AND client.id == %@ AND provider.id == %@", argumentArray: [order.date, order.clientID, order.providerID])
+        request.predicate = NSPredicate(format: "startDate == %@ AND client.id == %@ AND service.toProvider.id == %@", argumentArray: [order.startDate, order.clientID, order.providerID])
         let fetchResult = try context.fetch(request)
             
         return fetchResult.first
@@ -52,9 +51,8 @@ class OrderEntity: NSManagedObject {
     
     class func find(forUser user: UserModel, context: NSManagedObjectContext) throws -> [OrderEntity] {
         let request: NSFetchRequest<OrderEntity> = OrderEntity.fetchRequest()
-        print(user.id)
-        request.predicate = NSPredicate(format: "client.id == %@ OR provider.id == %@", argumentArray: [user.id, user.id])
-        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+        request.predicate = NSPredicate(format: "client.id == %@ OR service.toProvider.id == %@", argumentArray: [user.id, user.id])
+        request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
         do {
             let fetchResult = try context.fetch(request)
             return fetchResult
@@ -72,8 +70,8 @@ class OrderEntity: NSManagedObject {
         let endDateBackward = calendar.date(bySettingHour: hour - 1, minute: minutes, second: 0, of: date)
 
         let request: NSFetchRequest<OrderEntity> = OrderEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "provider.id == %@ AND (date > %@ AND date < %@)", argumentArray: [id, endDateBackward as Any, endDateForward as Any])
-        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+        request.predicate = NSPredicate(format: "service.toProvider.id == %@ AND (startDate > %@ AND startDate < %@)", argumentArray: [id, endDateBackward as Any, endDateForward as Any])
+        request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
         do {
             let fetchResult = try context.fetch(request)
             return fetchResult
