@@ -48,7 +48,7 @@ class CategorySelectionViewController: UIViewController {
         searchBarController.searchBar.placeholder = "Category name"
         definesPresentationContext = true
         
-        let categoryEntities = try? ServiceCategoryEntity.findAll(context: DataService.shared.persistentContainer.viewContext)
+        let categoryEntities = try? ServiceCategoryEntity.findAll(stack: DataService.shared.sharedCoreStore)
         categories = categoryEntities?.compactMap { ServiceCategoryModel(entity: $0) } ?? []
 
         view.addSubview(categoriesTableView)
@@ -84,12 +84,13 @@ class CategorySelectionViewController: UIViewController {
             guard
                 let nameText = alert.textFields?.first?.text,
                 let hoursCategoryTakesText = alert.textFields?[1].text,
-                let hoursCategoryTakes = Double(hoursCategoryTakesText) else {
+                let hoursCategoryTakes = Double(hoursCategoryTakesText),
+                hoursCategoryTakes >= 0 else {
                     return
             }
             let categoryModel = ServiceCategoryModel(name: nameText, standardLength: hoursCategoryTakes)
             do {
-                try ServiceCategoryEntity.findOrCreate(categoryModel, context: DataService.shared.persistentContainer.viewContext)
+                try ServiceCategoryEntity.findOrCreate(categoryModel, stack: DataService.shared.sharedCoreStore)
             } catch CategoryCreationError.alreadyExisted {
                 let alert = UIAlertController(title: "Error", message: "Category already exists", preferredStyle: .alert)
                 self.present(alert, animated: true)
@@ -115,11 +116,10 @@ extension CategorySelectionViewController: UISearchResultsUpdating {
     }
     
     func filterContentForSearchText(_ searchText: String) {
-        filteredCategories = categories.filter({ (category) -> Bool in
-            return category.name.lowercased().contains(searchText.lowercased())
-        })
-      
-      categoriesTableView.reloadData()
+        let filteredCategoryEntities = try? ServiceCategoryEntity.find(containingName: searchText, stack: DataService.shared.sharedCoreStore)
+        filteredCategories = filteredCategoryEntities?.compactMap( { ServiceCategoryModel(entity: $0)} ) ?? []
+        
+        categoriesTableView.reloadData()
     }
     
 }
@@ -136,9 +136,12 @@ extension CategorySelectionViewController: UITableViewDataSource, UITableViewDel
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         if isFiltering {
-            cell.textLabel?.text = "\(filteredCategories[indexPath.row].name) takes \(filteredCategories[indexPath.row].standardLength ?? 0) hours"
+            let count = try? ServiceCategoryEntity.findCountForCategory(filteredCategories[indexPath.row].name, stack: DataService.shared.sharedCoreStore)
+            cell.textLabel?.text = "\(filteredCategories[indexPath.row].name) takes \(filteredCategories[indexPath.row].standardLength ?? 0) hours, \(count ?? 0) services"
         } else {
-            cell.textLabel?.text = "\(categories[indexPath.row].name) takes \(categories[indexPath.row].standardLength ?? 0) hours"
+            let count = try? ServiceCategoryEntity.findCountForCategory(categories[indexPath.row].name, stack: DataService.shared.sharedCoreStore)
+
+            cell.textLabel?.text = "\(categories[indexPath.row].name) takes \(categories[indexPath.row].standardLength ?? 0) hours, \(count ?? 0) services"
         }
         return cell
     }
@@ -146,18 +149,21 @@ extension CategorySelectionViewController: UITableViewDataSource, UITableViewDel
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             if isFiltering {
-                let category = try? ServiceCategoryEntity.find(categoryName: filteredCategories[indexPath.row].name, context: DataService.shared.persistentContainer.viewContext)
-                DataService.shared.persistentContainer.viewContext.delete(category!)
+                let category = try? ServiceCategoryEntity.find(categoryName: filteredCategories[indexPath.row].name, stack: DataService.shared.sharedCoreStore)
+                try? DataService.shared.sharedCoreStore.perform(synchronous: { transaction in
+                    transaction.delete(category)
+                })
                 categories.removeAll { (category) -> Bool in
                     return category.name == filteredCategories[indexPath.row].name
                 }
                 filteredCategories.remove(at: indexPath.row)
             } else {
-                let category = try? ServiceCategoryEntity.find(categoryName: categories[indexPath.row].name, context: DataService.shared.persistentContainer.viewContext)
-                DataService.shared.persistentContainer.viewContext.delete(category!)
-                categories.remove(at: indexPath.row)
-            }
-            try? DataService.shared.persistentContainer.viewContext.save()
+                let category = try? ServiceCategoryEntity.find(categoryName: categories[indexPath.row].name, stack: DataService.shared.sharedCoreStore)
+                try? DataService.shared.sharedCoreStore.perform(synchronous: { transaction in
+                    transaction.delete(category)
+                })
+                    categories.remove(at: indexPath.row)
+                }
         }
     }
     

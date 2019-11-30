@@ -49,7 +49,7 @@ class ProfessionSelectionViewController: UIViewController {
         searchBarController.searchBar.placeholder = "Profession name"
         definesPresentationContext = true
         
-        let professionEntities = try? ProfessionEntity.findAll(context: DataService.shared.persistentContainer.viewContext)
+        let professionEntities = try? ProfessionEntity.findAll(stack: DataService.shared.sharedCoreStore)
         professions = professionEntities?.compactMap { ProfessionModel(fromEntity: $0) } ?? []
         
         view.addSubview(professionsTableView)
@@ -83,7 +83,7 @@ class ProfessionSelectionViewController: UIViewController {
             }
             let profession = ProfessionModel(name: professionName)
             do {
-                try ProfessionEntity.findOrCreate(profession, context: DataService.shared.persistentContainer.viewContext)
+                try ProfessionEntity.findOrCreate(profession, stack: DataService.shared.sharedCoreStore)
             } catch ProfessionCreationError.alreadyExisted {
                 let alert = UIAlertController(title: "Error", message: "Profession already exists", preferredStyle: .alert)
                 self.present(alert, animated: true)
@@ -116,9 +116,11 @@ extension ProfessionSelectionViewController: UITableViewDelegate, UITableViewDat
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = professionsTableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         if isFiltering {
-            cell.textLabel?.text = filteredProfessions[indexPath.row].name
+            let count = try? ProfessionEntity.findCountForProfession(filteredProfessions[indexPath.row].name, stack: DataService.shared.sharedCoreStore)
+            cell.textLabel?.text = "\(filteredProfessions[indexPath.row].name), \(count ?? 0) providers"
         } else {
-            cell.textLabel?.text = professions[indexPath.row].name
+            let count = try? ProfessionEntity.findCountForProfession(professions[indexPath.row].name, stack: DataService.shared.sharedCoreStore)
+            cell.textLabel?.text = "\(professions[indexPath.row].name), \(count ?? 0) providers"
         }
         return cell
     }
@@ -137,25 +139,28 @@ extension ProfessionSelectionViewController: UITableViewDelegate, UITableViewDat
             let professionEntity: ProfessionEntity?
             if isFiltering {
                 do {
-                    professionEntity = try ProfessionEntity.find(professionName: filteredProfessions[indexPath.row].name, context: DataService.shared.persistentContainer.viewContext)
+                    professionEntity = try ProfessionEntity.find(professionName: filteredProfessions[indexPath.row].name, stack: DataService.shared.sharedCoreStore)
                 } catch {
                     print("COULDN'T FIND ENTITY")
                     return
                 }
-                DataService.shared.persistentContainer.viewContext.delete(professionEntity!)
+                try? DataService.shared.sharedCoreStore.perform(synchronous: { transaction in
+                    transaction.delete(professionEntity)
+                })
                 professions.removeAll(where: { $0.name == filteredProfessions[indexPath.row].name })
                 filteredProfessions.remove(at: indexPath.row)
             } else {
                 do {
-                    professionEntity = try ProfessionEntity.find(professionName: professions[indexPath.row].name, context: DataService.shared.persistentContainer.viewContext)
+                    professionEntity = try ProfessionEntity.find(professionName: professions[indexPath.row].name, stack: DataService.shared.sharedCoreStore)
                 } catch {
                     print("COULDN'T FIND ENTITY")
                     return
                 }
-                DataService.shared.persistentContainer.viewContext.delete(professionEntity!)
+                try? DataService.shared.sharedCoreStore.perform(synchronous: { transaction in
+                    transaction.delete(professionEntity)
+                })
                 professions.remove(at: indexPath.row)
             }
-            try? DataService.shared.persistentContainer.viewContext.save()
         }
     }
 }
@@ -166,9 +171,8 @@ extension ProfessionSelectionViewController: UISearchResultsUpdating {
     }
     
     func filterContentForSearchText(_ searchText: String) {
-        filteredProfessions = professions.filter({ (profession) -> Bool in
-            return profession.name.lowercased().contains(searchText.lowercased())
-        })
+        let filteredProfessionEntities = try? ProfessionEntity.find(containigName: searchText, stack: DataService.shared.sharedCoreStore)
+        filteredProfessions = filteredProfessionEntities?.compactMap({ProfessionModel(fromEntity: $0)}) ?? []
       
       professionsTableView.reloadData()
     }

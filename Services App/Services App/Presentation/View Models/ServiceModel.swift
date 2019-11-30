@@ -11,6 +11,7 @@ import Foundation
 class ServiceModel {
     
     //MARK: - public variables
+    var id = UUID()
     var name: String
     var pricePerHour: Decimal?
     var category: ServiceCategoryModel?
@@ -23,6 +24,7 @@ class ServiceModel {
             let providerID = providerEntity.id else {
                 return nil
         }
+        self.id = entity.id!
         self.name = name
         self.pricePerHour = entity.pricePerHour! as Decimal
         self.category = ServiceCategoryModel(entity: entity.category!)

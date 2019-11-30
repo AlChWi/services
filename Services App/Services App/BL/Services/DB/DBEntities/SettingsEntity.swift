@@ -8,26 +8,27 @@
 
 import Foundation
 import CoreData
+import CoreStore
 
 class SettingsEntity: NSManagedObject {
     
     //MARK: - CLASS FUNCTIONSS
-    class func findOrCreate(context: NSManagedObjectContext) throws -> SettingsEntity {
-        if let settingsEntity = try? SettingsEntity.find(context: context) {
-            
+    class func findOrCreate(stack: DataStack) throws -> SettingsEntity {
+        if let settingsEntity = try? SettingsEntity.find(stack: stack) {
             return settingsEntity
         } else {
-            let settingsEntity = SettingsEntity(context: context)
-
-            return settingsEntity
+            try stack.perform(synchronous: { transaction in
+                _ = transaction.create(Into<SettingsEntity>())
+            })
+            let settingsEntity = try find(stack: stack)
+            return settingsEntity!
         }
     }
     
-    class func find(context: NSManagedObjectContext) throws -> SettingsEntity? {
-        let request: NSFetchRequest<SettingsEntity> = SettingsEntity.fetchRequest()
-        let fetchResult = try context.fetch(request)
-            
-        return fetchResult.first
+    class func find(stack: DataStack) throws -> SettingsEntity? {
+        return try stack.fetchOne(
+            From<SettingsEntity>()
+        )
     }
     //MARK: -
 }

@@ -128,7 +128,7 @@ class ChooseDateViewController: UIViewController, Instantiatable {
             let otherOrders = try? DataService.shared.findOrders(forUserByID: id, date: orderDatePicker.date),
             !otherOrders.isEmpty {
             let alert = UIAlertController(title: "Date",
-                                          message: "This provider has another order which time that intersects with this order. Please, choose another time",
+                                          message: "This provider has another order with time that intersects with this order. Please, choose another time",
                                           preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (action) in
                 alert?.dismiss(animated: true, completion: nil)

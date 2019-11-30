@@ -38,7 +38,11 @@ class ProviderCoordinator: SecondaryCoordinator {
         profileVC.setCoordinator(coordinator)
         profileTab.pushViewController(profileVC, animated: false)
         
-        mainTabBar.viewControllers = [ordersTab, myServicesTab, profileTab]
+        let allUsersVC = AllUsersViewController()
+        let allUsersTab = UINavigationController()
+        allUsersTab.pushViewController(allUsersVC, animated: false)
+        
+        mainTabBar.viewControllers = [ordersTab, myServicesTab, profileTab, allUsersTab]
         
         return mainTabBar
     }

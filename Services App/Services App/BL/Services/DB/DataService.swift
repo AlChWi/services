@@ -40,7 +40,7 @@ class DataService {
     
     @discardableResult
     func create(client: ClientModel) throws -> ClientEntity {
-        let client = try ClientEntity.findOrCreate(client, context: persistentContainer.viewContext)
+        let client = try ClientEntity.findOrCreate(client, stack: sharedCoreStore)
         if persistentContainer.viewContext.hasChanges {
             try persistentContainer.viewContext.save()
         }
@@ -49,7 +49,7 @@ class DataService {
     
     @discardableResult
     func create(provider: ProviderModel, profession: ProfessionModel) throws -> ProviderEntity {
-        let provider = try ProviderEntity.findOrCreate(provider, profession: profession, context: persistentContainer.viewContext)
+        let provider = try ProviderEntity.findOrCreate(provider, profession: profession, stack: sharedCoreStore)
         if persistentContainer.viewContext.hasChanges {
             try persistentContainer.viewContext.save()
         }
@@ -58,7 +58,7 @@ class DataService {
     
     @discardableResult
     func create(service: ServiceModel) throws -> ServiceEntity {
-        let service = try ServiceEntity.findOrCreate(service, context: persistentContainer.viewContext)
+        let service = try ServiceEntity.findOrCreate(service, stack: sharedCoreStore)
         if persistentContainer.viewContext.hasChanges {
             try persistentContainer.viewContext.save()
         }
@@ -67,40 +67,49 @@ class DataService {
     
     @discardableResult
     func create(order: OrderModel) throws -> OrderEntity {
-        let order = try OrderEntity.findOrCreate(order, context: persistentContainer.viewContext)
+        let order = try OrderEntity.findOrCreate(order, stack: sharedCoreStore)
         if persistentContainer.viewContext.hasChanges {
             try persistentContainer.viewContext.save()
         }
         return order
     }
     
-    func delete(order: OrderModel) throws {
-        let context = persistentContainer.viewContext
-        if let orderToDelete = try OrderEntity.find(order: order, context: context) {
-            context.delete(orderToDelete)
+    func complete(order: OrderModel, finalPrice: Decimal) throws {
+        if let orderToDelete = try OrderEntity.find(order: order, stack: sharedCoreStore) {
+            try sharedCoreStore.perform(synchronous: { transaction in
+                let orderToEdit = transaction.edit(orderToDelete)!
+                orderToEdit.completionDate = Date()
+                orderToEdit.finalPrice = finalPrice as NSDecimalNumber
+            })
         } else {
             print("couldn't find order")
-        }
-        if context.hasChanges {
-            try context.save()
         }
     }
     
     func delete(service: ServiceModel) throws {
-        let context = persistentContainer.viewContext
-        if let serviceToDelete = try ServiceEntity.find(serviceName: service.name, serviceProviderID: service.providerID, context: context) {
-            context.delete(serviceToDelete)
+        if let serviceToDelete = try ServiceEntity.find(serviceName: service.name, serviceProviderID: service.providerID, stack: sharedCoreStore) {
+            try sharedCoreStore.perform(synchronous: { transaction in
+                let serviceToDelete = transaction.edit(serviceToDelete)!
+                transaction.delete(serviceToDelete)
+            })
         } else {
             print("couldn't find service")
-        }
-        if context.hasChanges {
-            try context.save()
         }
     }
     
     func findOrders(forUser user: UserModel) throws -> [OrderModel] {
         do {
-            let orderEntities = try OrderEntity.find(forUser: user, context: persistentContainer.viewContext)
+            let orderEntities = try OrderEntity.find(forUser: user, stack: sharedCoreStore)
+            return orderEntities.compactMap { OrderModel(fromEntity: $0) }
+        } catch {
+            print(error)
+        }
+        return []
+    }
+    
+    func findOrders(forUser user: UserModel, completed: Bool) throws -> [OrderModel] {
+        do {
+            let orderEntities = try OrderEntity.find(forUser: user, complete: completed, stack: sharedCoreStore)
             return orderEntities.compactMap { OrderModel(fromEntity: $0) }
         } catch {
             print(error)
@@ -109,7 +118,7 @@ class DataService {
     }
     
     func canFindUser(withLogin login: String) -> Bool {
-        if let _ = try? UserEntity.findWithLogin(login: login, context: persistentContainer.viewContext) {
+        if let _ = try? UserEntity.findWithLogin(login: login, stack: sharedCoreStore) {
             return true
         } else {
             return false
@@ -117,7 +126,7 @@ class DataService {
     }
     
     func findUser(withLogin login: String, andPassword password: String) -> UserModel? {
-        let user = try? UserEntity.findProfile(login: login, password: password, context: persistentContainer.viewContext)
+        let user = try? UserEntity.findProfile(login: login, password: password, stack: sharedCoreStore)
         if let client = user as? ClientEntity {
             if let clientModel = ClientModel(fromEntity: client) {
                 return clientModel
@@ -132,43 +141,56 @@ class DataService {
      }
     
     func findUser(byID id: UUID) -> UserEntity? {
-        return try? UserEntity.find(userId: id, context: persistentContainer.viewContext)
+        return try? UserEntity.find(userId: id, stack: sharedCoreStore)
     }
     
     func findServicesFor(provider: ProviderModel) -> [ServiceModel] {
-        let serviceEntities = try? ProviderEntity.findServices(userID: provider.id, context: persistentContainer.viewContext)
+        let serviceEntities = try? ProviderEntity.findServices(userID: provider.id, stack: sharedCoreStore)
         let serviceModels = serviceEntities?.compactMap { ServiceModel(fromEntity: $0) }
         
         return serviceModels ?? []
     }
     
     func find(service: ServiceModel) -> ServiceEntity? {
-        return try? ServiceEntity.find(serviceName: service.name, serviceProviderID: service.providerID, context: persistentContainer.viewContext)
+        return try? ServiceEntity.find(serviceName: service.name, serviceProviderID: service.providerID, stack: sharedCoreStore)
     }
     
     func getSettings() throws -> SettingsEntity {
-        let settings = try SettingsEntity.findOrCreate(context: persistentContainer.viewContext)
+        let settings = try SettingsEntity.findOrCreate(stack: sharedCoreStore)
         return settings
     }
     
     func findServices() -> [ServiceModel] {
-        let serviceEntities = try? ServiceEntity.findAll(context: persistentContainer.viewContext)
+        let serviceEntities = try? ServiceEntity.findAll(stack: sharedCoreStore)
         let serviceModels = serviceEntities?.compactMap { ServiceModel(fromEntity: $0) }
         
         return serviceModels ?? []
     }
     
+    func findAllUsers() throws -> [UserModel] {
+        let entities = try UserEntity.findAll(stack: sharedCoreStore)
+        return entities.compactMap { (entity) -> ElementOfResult? in
+            switch entity {
+            case is ClientUser:
+                return ClientModel(fromEntity: <#T##ClientEntity?#>)
+            }
+        }
+    }
+    
     func findOrders(forUserByID id: UUID, date: Date) throws -> [OrderModel]? {
-        let orderEntities = try OrderEntity.find(forUserByID: id, andDate: date, context: persistentContainer.viewContext)
+        let orderEntities = try OrderEntity.find(forUserByID: id, andDate: date, stack: sharedCoreStore)
         let orderModels = orderEntities?.compactMap { OrderModel(fromEntity: $0) }
         return orderModels
     }
     
     func rememberUser(_ user: UserModel) throws {
         let settings = try getSettings()
-        let context = persistentContainer.viewContext
-        settings.currentUser = try UserEntity.find(userId: user.id, context: context)
-        try context.save()
+        let user = try UserEntity.find(userId: user.id, stack: sharedCoreStore)
+        try DataService.shared.sharedCoreStore.perform(synchronous: { transaction in
+            let settings = transaction.edit(settings)!
+            let user = transaction.edit(user)!
+            settings.currentUser = user
+        })
     }
     
     func getCurrentUser() throws -> UserModel? {
@@ -186,19 +208,15 @@ class DataService {
     
     func logOut() {
         let settings = try? getSettings()
-        settings?.currentUser = nil
-        try? persistentContainer.viewContext.save()
+        try? sharedCoreStore.perform(synchronous: { transaction in
+            let settings = transaction.edit(settings)!
+            settings.currentUser = nil
+        })
     }
     
     private init() {
-        try? sharedCoreStore.addStorage(SQLiteStore(fileName: "Services_App.sqlite"), completion: { (result) in
-            switch result {
-            case .failure(let error):
-                print(error)
-            case .success(let store):
-                return
-            }
-        })
+        try? sharedCoreStore.addStorageAndWait()
+        
     }
     
 }

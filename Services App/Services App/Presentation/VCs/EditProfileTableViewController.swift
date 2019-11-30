@@ -36,7 +36,7 @@ class EditProfileTableViewController: UITableViewController, Instantiatable {
     private var rememberedLogin: String?
     private var rememberedPassword: String?
     private var state: State = .creating
-    private var initialData: UserEntity?
+    private var initialData: UserModel?
     
     //MARK: - PRIVATE USER INFO VARIABLES
     private var photo: Data?
@@ -99,16 +99,22 @@ class EditProfileTableViewController: UITableViewController, Instantiatable {
         }
         profession = professionFromNotification
         chooseProfessionButton.setTitle(profession?.name, for: .normal)
-        print(profession?.name)
-        print(profession?.id)
+        enableDoneButtonIfSavePossible()
     }
     //MARK: -
     
     //MARK: - PUBLIC METHODS
-    func prepare(forRole role: Role, withLogin login: String?, andPassword password: String?) {
+    func prepareCreation(forRole role: Role, withLogin login: String?, andPassword password: String?) {
+        self.state = .creating
         self.role = role
         self.rememberedLogin = login
         self.rememberedPassword = password
+    }
+    
+    func prepareEditing(forRole role: Role, user: UserModel) {
+        self.state = .editing
+        self.role = role
+        self.initialData = user
     }
     
     func setCoordinator(_ coordinator: MainCoordinator) {
@@ -136,6 +142,19 @@ class EditProfileTableViewController: UITableViewController, Instantiatable {
         }
         if let password = rememberedPassword {
             passwordTextField.text = password
+        }
+        if state == .editing {
+            firstNameTextField.text = initialData?.firstName
+            lastNameTextField.text = initialData?.lastName
+            emailTextField.text = initialData?.email
+            ageTextField.text = "\(initialData?.age ?? 18)"
+            phoneNumberTextField.text = initialData?.phone
+            passwordTextField.text = initialData?.password
+            loginTextField.text = initialData?.login
+            if let image = initialData?.image {
+                userPhotoImageView.image = image
+                photo = image.pngData()
+            }
         }
     }
     
@@ -184,48 +203,81 @@ class EditProfileTableViewController: UITableViewController, Instantiatable {
         guard let age = age else {
             return
         }
-        if !checkUserNameAvailability() {
-            let alert = UIAlertController(title: "User Info", message: "There's another user with such login", preferredStyle: .alert)
-            present(alert, animated: true)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                alert.dismiss(animated: true, completion: nil)
-            }
-            loginTextField.layer.borderColor = UIColor.red.cgColor
-            loginTextField.layer.borderWidth = 1
-            loginTextField.layer.cornerRadius = 6
-            loginTextField.layer.masksToBounds = true
-            return
-        }
         
-        determineCoordinatorStrategy: switch role {
-        case .client:
-            do {
-                let client = ClientModel(login: login, password: password, firstName: firstName, lastname: lastName, age: age, email: email, phone: phoneNumber, image: photo)
-                try DataService.shared.create(client: client)
-                coordinator?.logIn(forRole: role!, withUser: client, fromModalScreen: self, profession: nil)
-            } catch {
-                print(error)
+        switch state {
+        case .creating:
+            if !checkUserNameAvailability() {
+                let alert = UIAlertController(title: "User Info", message: "There's another user with such login", preferredStyle: .alert)
+                present(alert, animated: true)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    alert.dismiss(animated: true, completion: nil)
+                }
+                loginTextField.layer.borderColor = UIColor.red.cgColor
+                loginTextField.layer.borderWidth = 1
+                loginTextField.layer.cornerRadius = 6
+                loginTextField.layer.masksToBounds = true
+                return
             }
-        case .provider:
+            switch role {
+            case .client:
+                do {
+                    let client = ClientModel(login: login, password: password, firstName: firstName, lastname: lastName, age: age, email: email, phone: phoneNumber, image: photo)
+                    try DataService.shared.create(client: client)
+                    coordinator?.logIn(forRole: role!, withUser: client, fromModalScreen: self, profession: nil)
+                } catch {
+                    print(error)
+                }
+            case .provider:
+                guard
+                    let profession = profession else {
+                        let alert = UIAlertController(title: "Not enough info", message: "Choose your profession", preferredStyle: .alert)
+                        present(alert, animated: true)
+                        DispatchQueue.main.asyncAfter(deadline: .now()) {
+                            alert.dismiss(animated: true, completion: nil)
+                        }
+                        return
+                }
+                do {
+                    let provider = ProviderModel(login: login, password: password, firstName: firstName, lastname: lastName, age: age, email: email, phone: phoneNumber, image: photo, profession: profession)
+                    try DataService.shared.create(provider: provider, profession: profession)
+                    coordinator?.logIn(forRole: role!, withUser: provider, fromModalScreen: self, profession: provider.profession)
+                } catch {
+                    print(error)
+                }
+            case .none:
+                print("Somethings is wrong")
+            }
+        case .editing:
             guard
-                let profession = profession else {
-                    let alert = UIAlertController(title: "Not enough info", message: "Choose your profession", preferredStyle: .alert)
-                    present(alert, animated: true)
-                    DispatchQueue.main.asyncAfter(deadline: .now()) {
-                        alert.dismiss(animated: true, completion: nil)
-                    }
+                let userID = initialData?.id else {
                     return
             }
-            do {
-                let provider = ProviderModel(login: login, password: password, firstName: firstName, lastname: lastName, age: age, email: email, phone: phoneNumber, image: photo, profession: profession)
-                try DataService.shared.create(provider: provider, profession: profession)
-                coordinator?.logIn(forRole: role!, withUser: provider, fromModalScreen: self, profession: provider.profession)
-            } catch {
-                print(error)
+            let entity = DataService.shared.findUser(byID: userID)
+            try? DataService.shared.sharedCoreStore.perform(synchronous: { transaction in
+                let entityToEdit = transaction.edit(entity)!
+                entityToEdit.firstName = firstName
+                entityToEdit.lastName = lastName
+                entityToEdit.age = age
+                entityToEdit.email = email
+                entityToEdit.phone = phoneNumber
+                entityToEdit.image = photo
+                entityToEdit.login = login
+                entityToEdit.password = password
+            })
+            let finalEntity = DataService.shared.findUser(byID: userID)
+            switch role {
+            case .provider:
+                guard let result = ProviderModel(fromEntity: finalEntity as? ProviderEntity) else { return  }
+                coordinator?.didFinishEditingUser(withResult: result)
+            case .client:
+                guard let result = ClientModel(fromEntity: finalEntity as? ClientEntity) else { return }
+                coordinator?.didFinishEditingUser(withResult: result)
+            case .none:
+                return
             }
-        case .none:
-            print("Somethings is wrong")
+            dismiss(animated: true, completion: nil)
         }
+        
         
     }
     

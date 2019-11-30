@@ -8,44 +8,56 @@
 
 import Foundation
 import CoreData
+import CoreStore
 
 class ServiceCategoryEntity: NSManagedObject {
-    class func findOrCreate(_ category: ServiceCategoryModel, context: NSManagedObjectContext) throws -> ServiceCategoryEntity {
-        if let _ = try? ServiceCategoryEntity.find(categoryName: category.name, context: context) {
+    class func findOrCreate(_ category: ServiceCategoryModel, stack: DataStack) throws -> ServiceCategoryEntity {
+        if let _ = try? ServiceCategoryEntity.find(categoryName: category.name, stack: stack) {
             throw ServiceCreationErrors.alreadyExisted
         } else {
-            let categoryEntity = ServiceCategoryEntity(context: context)
-            categoryEntity.name = category.name
-            categoryEntity.id = category.id
-            categoryEntity.standardLength = category.standardLength ?? 0
+            try stack.perform(synchronous: { transaction in
+                let entity = transaction.create(Into<ServiceCategoryEntity>())
+                entity.name = category.name
+                entity.id = category.id
+                entity.standardLength = category.standardLength ?? 0
+            })
+            let categoryEntity = try stack.fetchOne(
+                From<ServiceCategoryEntity>()
+                    .where(\.id == category.id)
+            )
             
             print("category created")
-            return categoryEntity
+            return categoryEntity!
         }
     }
     
-    class func find(categoryName: String, context: NSManagedObjectContext) throws -> ServiceCategoryEntity? {
-        let request: NSFetchRequest<ServiceCategoryEntity> = ServiceCategoryEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "name == %@", argumentArray: [categoryName])
-        let fetchResult = try context.fetch(request)
-        
-        return fetchResult.first
+    class func find(categoryName: String, stack: DataStack) throws -> ServiceCategoryEntity? {
+        return try stack.fetchOne(
+            From<ServiceCategoryEntity>()
+                .where(\.name == categoryName)
+        )
     }
     
-    class func find(containingName name: String, context: NSManagedObjectContext) throws -> ServiceCategoryEntity? {
-        let request: NSFetchRequest<ServiceCategoryEntity> = ServiceCategoryEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "name CONTAINS %@", argumentArray: [name])
-        request.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
-        let fetchResult = try context.fetch(request)
+    class func find(containingName name: String, stack: DataStack) throws -> [ServiceCategoryEntity]? {
+        return try stack.fetchAll(
+            From<ServiceCategoryEntity>()
+                .where(format: "%K CONTAINS %@", #keyPath(ServiceCategoryEntity.name).lowercased(), name.lowercased())
+        )
         
-        return fetchResult.first
     }
     
-    class func findAll(context: NSManagedObjectContext) throws -> [ServiceCategoryEntity] {
-        let request: NSFetchRequest<ServiceCategoryEntity> = ServiceCategoryEntity.fetchRequest()
-        let fetchResult = try context.fetch(request)
-        
-        return fetchResult
+    class func findCountForCategory(_ categoryName: String, stack: DataStack) throws -> Int {
+        return try stack.queryValue(
+            From<ServiceEntity>(),
+            Select(.count(\.id)),
+            Where<ServiceEntity>(\.category?.name == categoryName)
+        )!
+    }
+    
+    class func findAll(stack: DataStack) throws -> [ServiceCategoryEntity] {
+        return try stack.fetchAll(
+            From<ServiceCategoryEntity>()
+        )
     }
 }
 

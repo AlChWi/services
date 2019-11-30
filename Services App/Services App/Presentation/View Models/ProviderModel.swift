@@ -11,7 +11,6 @@ import Foundation
 class ProviderModel: UserModel {
     
     //MARK: - PUBLIC VARIABLES
-    var orders: [OrderModel]?
     var services: [ServiceModel]?
     var profession: ProfessionModel?
     //MARK: -
@@ -21,8 +20,6 @@ class ProviderModel: UserModel {
         guard let entity = entity else {
             return nil
         }
-        let orderEntities = entity.orders?.allObjects as? [OrderEntity]
-        self.orders = orderEntities?.compactMap { OrderModel(fromEntity: $0) } ?? []
         let serviceEntities = entity.services?.allObjects as? [ServiceEntity]
         self.services = serviceEntities?.compactMap { ServiceModel(fromEntity: $0) } ?? []
         if let profession = entity.profession {

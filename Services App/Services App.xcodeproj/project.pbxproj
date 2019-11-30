@@ -60,6 +60,8 @@
 		9BC536DC238B075F00DB99D6 /* ProfessionSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC536DB238B075F00DB99D6 /* ProfessionSelectionViewController.swift */; };
 		9BC536DE238B330000DB99D6 /* ServiceCategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC536DD238B330000DB99D6 /* ServiceCategoryModel.swift */; };
 		9BC536E0238B35B800DB99D6 /* CategorySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC536DF238B35B800DB99D6 /* CategorySelectionViewController.swift */; };
+		9BC536E2239024E100DB99D6 /* OrdersSegmentedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC536E1239024E100DB99D6 /* OrdersSegmentedViewController.swift */; };
+		9BC536E4239264CD00DB99D6 /* AllUsersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC536E3239264CC00DB99D6 /* AllUsersViewController.swift */; };
 		A7FACD6A65958E0D5DD0BE38 /* Pods_Services_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B3245F6131F91D3A09B344 /* Pods_Services_App.framework */; };
 /* End PBXBuildFile section */
 
@@ -120,6 +122,8 @@
 		9BC536DB238B075F00DB99D6 /* ProfessionSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfessionSelectionViewController.swift; sourceTree = "<group>"; };
 		9BC536DD238B330000DB99D6 /* ServiceCategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCategoryModel.swift; sourceTree = "<group>"; };
 		9BC536DF238B35B800DB99D6 /* CategorySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySelectionViewController.swift; sourceTree = "<group>"; };
+		9BC536E1239024E100DB99D6 /* OrdersSegmentedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersSegmentedViewController.swift; sourceTree = "<group>"; };
+		9BC536E3239264CC00DB99D6 /* AllUsersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllUsersViewController.swift; sourceTree = "<group>"; };
 		A399951566F409977376EB8D /* Pods-Services App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Services App.debug.xcconfig"; path = "Target Support Files/Pods-Services App/Pods-Services App.debug.xcconfig"; sourceTree = "<group>"; };
 		AEEA1FB9DF6C8BD12E94C0AE /* Pods-Services App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Services App.release.xcconfig"; path = "Target Support Files/Pods-Services App/Pods-Services App.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -196,7 +200,9 @@
 			isa = PBXGroup;
 			children = (
 				8840BF692350D19A004DE39B /* LoginViewController.swift */,
+				9BC536E3239264CC00DB99D6 /* AllUsersViewController.swift */,
 				9BC536DB238B075F00DB99D6 /* ProfessionSelectionViewController.swift */,
+				9BC536E1239024E100DB99D6 /* OrdersSegmentedViewController.swift */,
 				9BC536DF238B35B800DB99D6 /* CategorySelectionViewController.swift */,
 				8840BF6C2350D1C2004DE39B /* ChooseRoleViewController.swift */,
 				887F4241235883C80007FD0C /* ChooseDateViewController.swift */,
@@ -459,6 +465,7 @@
 				886F4FE9235F311500F92937 /* Notification+extensions.swift in Sources */,
 				887D90B9235741E8008B3617 /* OrdersForDate.swift in Sources */,
 				8840BF662350C4D1004DE39B /* ClientCoordinator.swift in Sources */,
+				9BC536E4239264CD00DB99D6 /* AllUsersViewController.swift in Sources */,
 				8840BF7D2350D3A8004DE39B /* MyServicesViewController.swift in Sources */,
 				88553D2F235DB54200D2B1BE /* SecondaryCoordinator.swift in Sources */,
 				9BC536DC238B075F00DB99D6 /* ProfessionSelectionViewController.swift in Sources */,
@@ -486,6 +493,7 @@
 				888234B42354A35E00BC25E0 /* OrderModel.swift in Sources */,
 				8840BF732350D22E004DE39B /* UserProfileTableViewController.swift in Sources */,
 				8840BF632350C476004DE39B /* AppCoordinator.swift in Sources */,
+				9BC536E2239024E100DB99D6 /* OrdersSegmentedViewController.swift in Sources */,
 				8840BF6F2350D1EC004DE39B /* EditProfileTableViewController.swift in Sources */,
 				88553D2D235DB34300D2B1BE /* MainCoordinator.swift in Sources */,
 				8840BF6D2350D1C2004DE39B /* ChooseRoleViewController.swift in Sources */,
@@ -638,7 +646,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 7MSPFU2KV4;
+				DEVELOPMENT_TEAM = 8CTGEUBGR5;
 				INFOPLIST_FILE = "Services App/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -658,7 +666,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 7MSPFU2KV4;
+				DEVELOPMENT_TEAM = 8CTGEUBGR5;
 				INFOPLIST_FILE = "Services App/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (

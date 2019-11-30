@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CoreStore
 
 class AppCoordinator: MainCoordinator {
     
@@ -100,6 +101,31 @@ class AppCoordinator: MainCoordinator {
         navVC.pushViewController(vc, animated: true)
     }
     
+    func didFinishEditingUser(withResult result: UserModel) {
+        currentUser = result
+    }
+    
+    func openEdit(from screen: UIViewController) {
+        guard
+            let currentUser = currentUser else {
+                return
+        }
+        let vc = EditProfileTableViewController.instantiate()
+        vc.setCoordinator(self)
+        switch currentUser {
+        case is ProviderModel:
+            vc.prepareEditing(forRole: .provider, user: currentUser)
+        case is ClientModel:
+            vc.prepareEditing(forRole: .client, user: currentUser)
+        default:
+            return
+        }
+        let navVC = UINavigationController()
+        navVC.pushViewController(vc, animated: false)
+        navVC.modalPresentationStyle = .fullScreen
+        screen.present(navVC, animated: true, completion: nil)
+    }
+    
     func logOut() {
         DataService.shared.logOut()
         currentUser = nil
@@ -128,7 +154,7 @@ class AppCoordinator: MainCoordinator {
                    andPassword password: String?,
                    fromScreen vc: UIViewController) {
         let editProfileVC = EditProfileTableViewController.instantiate()
-        editProfileVC.prepare(forRole: role, withLogin: login, andPassword: password)
+        editProfileVC.prepareCreation(forRole: role, withLogin: login, andPassword: password)
         editProfileVC.setCoordinator(self)
         if let navigation = vc.navigationController {
             navigation.pushViewController(editProfileVC, animated: true)
@@ -151,8 +177,9 @@ class AppCoordinator: MainCoordinator {
             }
         }
         //MARK: -
-        let result = UserEntity.findWithMostMoney(inDataStack: DataService.shared.sharedCoreStore)
+        let result = try? UserEntity.findWithMostMoney(inDataStack: DataService.shared.sharedCoreStore)
         print(result?.money)
+        ProviderEntity.createWithCoreStore(store: DataService.shared.sharedCoreStore)
 
     }
     //MARK: -

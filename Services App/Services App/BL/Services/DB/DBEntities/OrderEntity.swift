@@ -8,77 +8,103 @@
 
 import Foundation
 import CoreData
+import CoreStore
 
 class OrderEntity: NSManagedObject {
     
     //MARK: - CLASS METHODS
-    class func findOrCreate(_ order: OrderModel, context: NSManagedObjectContext) throws -> OrderEntity {
-        if let orderEntity = try OrderEntity.find(order: order, context: context) {
-            
+    class func findOrCreate(_ order: OrderModel, stack: DataStack) throws -> OrderEntity {
+        if let orderEntity = try OrderEntity.find(order: order, stack: stack) {
             return orderEntity
         } else {
-            guard let _ = DataService.shared.findUser(byID: order.providerID) as? ProviderEntity, let client = DataService.shared.findUser(byID: order.clientID) as? ClientEntity else {
-                throw OrderCreationErrors.couldntFindUser
-            }
-            guard let service = try ServiceEntity.find(serviceName: order.serviceName, serviceProviderID: order.providerID, context: context) else {
-                throw OrderCreationErrors.CouldntFindService
-            }
-            
-            let orderEntity = OrderEntity(context: context)
-            orderEntity.startDate = order.startDate
-            orderEntity.client = client
-            orderEntity.service = service
+            try stack.perform(synchronous: { transaction in
+                guard
+                    let client = try stack.fetchOne(
+                        From<ClientEntity>()
+                            .where(\.id == order.clientID)
+                    ),
+                    let service = try stack.fetchOne(
+                        From<ServiceEntity>()
+                            .where(\.name == order.serviceName && \.toProvider?.id == order.providerID)
+                    ),
+                    let _ = try stack.fetchOne(
+                        From<ProviderEntity>()
+                            .where(\.id == service.toProvider?.id)
+                    ) else {
+                        try transaction.cancel()
+                }
+                let entity = transaction.create(Into<OrderEntity>())
+                let clientRel = transaction.edit(client)!
+                let serviceRel = transaction.edit(service)!
+                entity.startDate = order.startDate
+                entity.client = clientRel
+                entity.service = serviceRel
+            })
             
             print("order created")
-            return orderEntity
+            return try stack.fetchOne(
+                From<OrderEntity>()
+                    .where(\.startDate == order.startDate && \.service?.toProvider?.id == order.providerID)
+                )!
         }
     }
     
-    class func find(order: OrderModel, context: NSManagedObjectContext) throws -> OrderEntity? {
-        let request: NSFetchRequest<OrderEntity> = OrderEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "startDate == %@ AND client.id == %@ AND service.toProvider.id == %@", argumentArray: [order.startDate, order.clientID, order.providerID])
-        let fetchResult = try context.fetch(request)
-            
-        return fetchResult.first
+    class func find(order: OrderModel, stack: DataStack) throws -> OrderEntity? {
+        return try stack.fetchOne(
+            From<OrderEntity>()
+                .where(\.startDate == order.startDate && \.client?.id == order.clientID && \.service?.toProvider?.id == order.providerID)
+        )
     }
     
-    class func findAll(context: NSManagedObjectContext) throws -> [OrderEntity] {
-        let request: NSFetchRequest<OrderEntity> = OrderEntity.fetchRequest()
-        let fetchResult = try context.fetch(request)
-            
-        return fetchResult
+    class func findAll(stack: DataStack) throws -> [OrderEntity] {
+        return try stack.fetchAll(
+            From<OrderEntity>()
+        )
     }
     
-    class func find(forUser user: UserModel, context: NSManagedObjectContext) throws -> [OrderEntity] {
-        let request: NSFetchRequest<OrderEntity> = OrderEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "client.id == %@ OR service.toProvider.id == %@", argumentArray: [user.id, user.id])
-        request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
-        do {
-            let fetchResult = try context.fetch(request)
-            return fetchResult
-        } catch {
-            print(error)
-            return []
+    class func find(forUser user: UserModel, stack: DataStack) throws -> [OrderEntity] {
+        return try stack.fetchAll(
+            From<OrderEntity>()
+                .where(\.client?.id == user.id || \.service?.toProvider?.id == user.id)
+                .orderBy(.descending(\.startDate))
+        )
+    }
+    
+    class func find(forUser user: UserModel, complete: Bool, stack: DataStack) throws -> [OrderEntity] {
+        if complete {
+            return try stack.fetchAll(
+                From<OrderEntity>()
+                    .where((\.client?.id == user.id || \.service?.toProvider?.id == user.id) && \.completionDate != nil)
+                    .orderBy(.descending(\.startDate))
+            )
+        } else {
+            return try stack.fetchAll(
+                From<OrderEntity>()
+                    .where((\.client?.id == user.id || \.service?.toProvider?.id == user.id) && \.completionDate == nil)
+                    .orderBy(.descending(\.startDate))
+            )
         }
     }
     
-    class func find(forUserByID id: UUID, andDate date: Date, context: NSManagedObjectContext) throws -> [OrderEntity]? {
+//    class func find(forUser user: UserModel, containingName name: String, orInCategory category: String, stack: DataStack) throws -> [OrderEntity]? {
+//        return try stack.fetchAll(
+//            From<OrderEntity>()
+//                .where("%K CONTAINS %@ OR %K CONTAINS %@ OR %K CONTAINS %@ OR %K CONTAINS %@", #keyPath(OrderEntity.client.firstName).lowercased(), user.firstName.lowercased(), #keyPath(OrderEntity.service.toProvider.firstName).lowercased(), user.firstName.lowercased(), #keyPath(OrderEntity.service.name).lowercased(), name.lowercased(), #keyPath(OrderEntity.service.category).lowercased(), category.lowercased())
+//        )
+//    }
+    
+    class func find(forUserByID id: UUID, andDate date: Date, stack: DataStack) throws -> [OrderEntity]? {
         let calendar = Calendar.current
         let hour = calendar.component(.hour, from: date)
         let minutes = calendar.component(.minute, from: date)
         let endDateForward = calendar.date(bySettingHour: hour + 1, minute: minutes, second: 0, of: date)
         let endDateBackward = calendar.date(bySettingHour: hour - 1, minute: minutes, second: 0, of: date)
-
-        let request: NSFetchRequest<OrderEntity> = OrderEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "service.toProvider.id == %@ AND (startDate > %@ AND startDate < %@)", argumentArray: [id, endDateBackward as Any, endDateForward as Any])
-        request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
-        do {
-            let fetchResult = try context.fetch(request)
-            return fetchResult
-        } catch {
-            print(error)
-            return nil
-        }
+        
+        return try stack.fetchAll(
+            From<OrderEntity>()
+                .where(\.service?.toProvider?.id == id && \.startDate > endDateBackward && \.startDate < endDateForward)
+                .orderBy(.descending(\.startDate))
+        )
     }
     //MARK: -
 }

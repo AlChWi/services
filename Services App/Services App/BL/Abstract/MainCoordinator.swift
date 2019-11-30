@@ -30,5 +30,7 @@ protocol MainCoordinator: class {
     func chooseDate(forService service: ServiceModel, fromScreen vc: UIViewController)
     func showProfessionSelection(navVC: UINavigationController)
     func showCategorySelection(navVC: UINavigationController)
+    func didFinishEditingUser(withResult result: UserModel) 
+    func openEdit(from screen: UIViewController) 
     func logOut()
 }

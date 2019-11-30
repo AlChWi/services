@@ -13,6 +13,7 @@ class OrderModel {
     
     //MARK: - PUBLIC VARIABLES
     var startDate: Date
+    var finalPrice: Decimal?
     var clientID: UUID
     var clientName: String?
     var clientPhoto: UIImage?
@@ -38,6 +39,7 @@ class OrderModel {
             self.clientPhoto = UIImage(data: data)
         }
         self.clientID = clientID
+        self.finalPrice = entity.finalPrice as Decimal?
         self.providerName = "\(entity.service?.toProvider?.firstName ?? "") \(entity.service?.toProvider?.lastName ?? "")"
         if let data = entity.service?.toProvider?.image {
             self.providerPhoto = UIImage(data: data)

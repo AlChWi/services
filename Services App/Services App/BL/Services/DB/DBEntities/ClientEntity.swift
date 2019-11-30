@@ -8,37 +8,48 @@
 
 import Foundation
 import CoreData
+import CoreStore
 
 class ClientEntity: UserEntity {
     
     //MARK: - CLASS METHODS
-    class func findOrCreate(_ user: UserModel, context: NSManagedObjectContext) throws -> ClientEntity {
-        if let clientEntity = try? ClientEntity.find(userId: user.id, context: context) {
+    class func findOrCreate(_ user: UserModel, stack: DataStack) throws -> ClientEntity {
+        if let clientEntity = try? ClientEntity.find(userId: user.id, stack: stack) {
             
             return clientEntity
         } else {
-            let clientEntity = ClientEntity(context: context)
-            clientEntity.id = user.id
-            clientEntity.firstName = user.firstName
-            clientEntity.lastName = user.lastName
-            clientEntity.login = user.login
-            clientEntity.password = user.password
-            clientEntity.age = user.age
-            clientEntity.email = user.email
-            clientEntity.phone = user.phone
-            clientEntity.money = user.money as NSDecimalNumber
-            clientEntity.image = user.image?.jpegData(compressionQuality: 1)
-            
-            return clientEntity
+            try stack.perform(synchronous: { transaction in
+                let client = transaction.create(Into<ClientEntity>())
+                client.firstName = user.firstName
+                client.lastName = user.lastName
+                client.login = user.login
+                client.password = user.password
+                client.email = user.email
+                client.age = user.age
+                client.money = 10000.0
+                client.image = user.image?.pngData()
+                client.id = user.id
+                client.phone = user.phone
+            })
+            let clientEntity = try stack.fetchOne(
+            From<ClientEntity>()
+                .where(\.id == user.id)
+            )
+            return clientEntity!
         }
     }
     
-    override class func find(userId: UUID, context: NSManagedObjectContext) throws -> ClientEntity? {
-        let request: NSFetchRequest<ClientEntity> = ClientEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %id", argumentArray: [userId])
-        let fetchResult = try context.fetch(request)
-            
-        return fetchResult.first
+    override class func find(userId: UUID, stack: DataStack) throws -> ClientEntity? {
+        let result = try stack.fetchOne(
+            From<UserEntity>()
+                .where(\.id == userId)
+        )
+        switch result {
+        case is ClientEntity:
+            return result as? ClientEntity
+        default:
+            return nil
+        }
     }
     //MARK: -
     

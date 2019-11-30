@@ -147,10 +147,8 @@ extension MyServicesViewController: UISearchResultsUpdating {
     }
     
     func filterContentForSearchText(_ searchText: String) {
-        filteredServices = services.filter({ (service) -> Bool in
-            return service.name.lowercased().contains(searchText.lowercased()) || service.category?.name.lowercased().contains(searchText.lowercased()) ?? false
-        })
-      
-      myServicesTableView.reloadData()
+        let filteredServiceEntities = try? ServiceEntity.find(containingName: searchText, orInCategory: searchText, andFromProvider: coordinator!.currentUser!.id, stack: DataService.shared.sharedCoreStore)
+        filteredServices = filteredServiceEntities?.compactMap( { ServiceModel(fromEntity: $0) }) ?? []
+        myServicesTableView.reloadData()
     }
 }

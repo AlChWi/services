@@ -83,16 +83,9 @@ class AllServicesViewController: UIViewController, Instantiatable {
     }
     
     @objc private func refreshInfo() {
-        DispatchQueue.global(qos: .userInitiated).async {
-            let servicesToAdd = DataService.shared.findServices()
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
-                    return
-                }
-                self.services = servicesToAdd.sorted { $0.name.lowercased() < $1.name.lowercased() }
-                self.refreshControl.endRefreshing()
-            }
-        }
+        let servicesToAdd = DataService.shared.findServices()
+        self.services = servicesToAdd.sorted { $0.name.lowercased() < $1.name.lowercased() }
+        self.refreshControl.endRefreshing()
     }
     
     private func configureNavigationItem() {
@@ -119,9 +112,13 @@ extension AllServicesViewController: UITableViewDataSource, UITableViewDelegate 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = servicesTableView.dequeueReusableCell(withIdentifier: Constants.CellIDs.serviceCell, for: indexPath) as? ServiceWithProviderTableViewCell
         if isFiltering {
-            cell?.configure(forService: filteredServices[indexPath.row], andProvider: filteredProviders[indexPath.row])
+            let countOfOrders = try? ServiceEntity.countOfOrders(forService: filteredServices[indexPath.row], stack: DataService.shared.sharedCoreStore)
+
+            cell?.configure(forService: filteredServices[indexPath.row], andProvider: filteredProviders[indexPath.row], countOfOrders: countOfOrders ?? 0)
         } else {
-            cell?.configure(forService: services[indexPath.row], andProvider: providers[indexPath.row])
+            let countOfOrders = try? ServiceEntity.countOfOrders(forService: services[indexPath.row], stack: DataService.shared.sharedCoreStore)
+
+            cell?.configure(forService: services[indexPath.row], andProvider: providers[indexPath.row], countOfOrders: countOfOrders ?? 0)
         }
         return cell ?? UITableViewCell()
     }
@@ -144,9 +141,8 @@ extension AllServicesViewController: UISearchResultsUpdating {
     }
     
     func filterContentForSearchText(_ searchText: String) {
-        filteredServices = services.filter({ (service) -> Bool in
-            return service.name.lowercased().contains(searchText.lowercased()) || service.category?.name.lowercased().contains(searchText.lowercased()) ?? false
-        })
+        let filteredServiceEntities = try? ServiceEntity.find(containingName: searchText, orInCategory: searchText, orFromProvider: searchText, stack: DataService.shared.sharedCoreStore)
+        filteredServices = filteredServiceEntities?.compactMap( { ServiceModel(fromEntity: $0) }) ?? []
         
         servicesTableView.reloadData()
     }

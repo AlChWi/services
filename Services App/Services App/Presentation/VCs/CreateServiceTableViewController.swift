@@ -46,6 +46,7 @@ class CreateServiceTableViewController: UITableViewController, Instantiatable {
         if let category = notification.userInfo?["category"] as? ServiceCategoryModel {
             chooseCategoryButton.setTitle(category.name, for: .normal)
             self.category = category
+            enableAddButtonIfSavePossible()
         }
     }
     

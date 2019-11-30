@@ -15,7 +15,11 @@ class ClientModel: UserModel {
     //MARK: -
     
     //MARK: - INIT
-    init?(fromEntity entity: ClientEntity) {
+    init?(fromEntity entity: ClientEntity?) {
+        guard let entity = entity else {
+            return nil
+        }
+        
         let orderEntities = entity.orders?.allObjects as? [OrderEntity]
         self.orders = orderEntities?.compactMap { OrderModel(fromEntity: $0) } ?? []
         

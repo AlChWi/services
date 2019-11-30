@@ -53,7 +53,7 @@ class OrderTableViewCell: UITableViewCell {
     //MARK: - PUBLIC METHODS
     func configure(forOrder order: OrderModel) {
         serviceNameLabel.text = order.serviceName
-        let service = try? ServiceEntity.find(serviceName: order.serviceName, serviceProviderID: order.providerID, context: DataService.shared.persistentContainer.viewContext)
+        let service = try? ServiceEntity.find(serviceName: order.serviceName, serviceProviderID: order.providerID, stack: DataService.shared.sharedCoreStore)
         serviceCategoryLabel.text = service?.category?.name
         servicePriceLabel.text = "\(service?.pricePerHour ?? 0)$/h"
         if let image = order.providerPhoto {
@@ -75,6 +75,18 @@ class OrderTableViewCell: UITableViewCell {
     
     func hideDoneButton() {
         doneButton.isHidden = true
+    }
+    
+    func showDoneButton() {
+        doneButton.isHidden = false
+        doneButton.setTitle("Done", for: .normal)
+        doneButton.isUserInteractionEnabled = true
+    }
+    
+    func showFinalPrice(price: Decimal) {
+        doneButton.isHidden = false
+        doneButton.setTitle("\(price)", for: .normal)
+        doneButton.isUserInteractionEnabled = false
     }
     //MARK: -
     

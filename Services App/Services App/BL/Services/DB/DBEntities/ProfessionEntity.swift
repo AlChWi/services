@@ -8,43 +8,54 @@
 
 import Foundation
 import CoreData
+import CoreStore
 
 class ProfessionEntity: NSManagedObject {
-    class func findOrCreate(_ profession: ProfessionModel, context: NSManagedObjectContext) throws -> ProfessionEntity {
-        if let _ = try? ProfessionEntity.find(professionName: profession.name, context: context) {
+    class func findOrCreate(_ profession: ProfessionModel, stack: DataStack) throws -> ProfessionEntity {
+        if let _ = try? ProfessionEntity.find(professionName: profession.name, stack: stack) {
             throw ProfessionCreationError.alreadyExisted
         } else {
-            let professionEntity = ProfessionEntity(context: context)
-            professionEntity.name = profession.name
-            professionEntity.id = profession.id
+            try stack.perform(synchronous: { transaction in
+                let entity = transaction.create(Into<ProfessionEntity>())
+                entity.name = profession.name
+                entity.id = profession.id
+            })
+            let professionEntity = try stack.fetchOne(
+                From<ProfessionEntity>()
+                    .where(\.id == profession.id)
+            )
 
             print("profession created")
-            return professionEntity
+            return professionEntity!
         }
     }
     
-    class func find(professionName: String, context: NSManagedObjectContext) throws -> ProfessionEntity? {
-        let request: NSFetchRequest<ProfessionEntity> = ProfessionEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "name == %@", argumentArray: [professionName])
-        let fetchResult = try context.fetch(request)
-            
-        return fetchResult.first
+    class func find(professionName: String, stack: DataStack) throws -> ProfessionEntity? {
+        return try stack.fetchOne(
+            From<ProfessionEntity>()
+                .where(\.name == professionName)
+        )
     }
     
-    class func find(containigName name: String, context: NSManagedObjectContext) throws -> ProfessionEntity? {
-        let request: NSFetchRequest<ProfessionEntity> = ProfessionEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "name CONTAINS %@", argumentArray: [name])
-        request.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
-        let fetchResult = try context.fetch(request)
-            
-        return fetchResult.first
+    class func find(containigName name: String, stack: DataStack) throws -> [ProfessionEntity]? {
+        return try stack.fetchAll(
+            From<ProfessionEntity>()
+                .where(format: "%K CONTAINS %@", #keyPath(ProfessionEntity.name).lowercased(), name.lowercased())
+        )
     }
     
-    class func findAll(context: NSManagedObjectContext) throws -> [ProfessionEntity] {
-        let request: NSFetchRequest<ProfessionEntity> = ProfessionEntity.fetchRequest()
-        let fetchResult = try context.fetch(request)
-            
-        return fetchResult
+    class func findCountForProfession(_ professionName: String, stack: DataStack) throws -> Int {
+        return try stack.queryValue(
+            From<ProviderEntity>(),
+            Select(.count(\.id)),
+            Where<ProviderEntity>(\.profession?.name == professionName)
+        )!
+    }
+    
+    class func findAll(stack: DataStack) throws -> [ProfessionEntity] {
+        return try stack.fetchAll(
+            From<ProfessionEntity>()
+        )
     }
 }
 

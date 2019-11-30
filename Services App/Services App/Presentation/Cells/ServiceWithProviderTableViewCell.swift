@@ -36,8 +36,8 @@ class ServiceWithProviderTableViewCell: UITableViewCell {
     //MARK: -
     
     //MARK: - PUBLIC METHODS
-    func configure(forService service: ServiceModel, andProvider provider: ProviderModel) {
-        self.serviceNameLabel.text = service.name
+    func configure(forService service: ServiceModel, andProvider provider: ProviderModel, countOfOrders: Int) {
+        self.serviceNameLabel.text = "\(service.name)\n\(countOfOrders) orders"
         self.providerNameLabel.text = "\(provider.firstName) \(provider.lastName)"
         self.serviceCategoryLabel.text = service.category?.name
         self.servicePriceLabel.text = "\(service.pricePerHour ?? 0)$/h"

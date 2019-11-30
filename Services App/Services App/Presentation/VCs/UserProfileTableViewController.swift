@@ -22,8 +22,9 @@ class UserProfileTableViewController: UITableViewController, Instantiatable {
     @IBOutlet private weak var logOutButton: UIButton!
     //MARK: -
     
-    //MARK: - PRIVATE WEAK VARIABLES
+    //MARK: - PRIVATE VARIABLES
     private weak var coordinator: MainCoordinator?
+    private lazy var editBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(openEdit))
     //MARK: -
 
     //MARK: - LIFECYCLE
@@ -68,6 +69,12 @@ class UserProfileTableViewController: UITableViewController, Instantiatable {
     //MARK: - PRIVATE METHODS
     private func configureNavigationItem() {
         title = "My Profile"
+        navigationItem.rightBarButtonItem = editBarButtonItem
+    }
+    
+    @objc
+    private func openEdit() {
+        coordinator?.openEdit(from: self)
     }
     
     private func configureUserPhoto() {

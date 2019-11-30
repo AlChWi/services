@@ -25,28 +25,17 @@
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.RuntimeIssueBreakpoint">
-         <BreakpointContent
-            uuid = "88D889EA-833E-49BF-A513-CDB5CC271535"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            breakpointStackSelectionBehavior = "1"
-            type = "65535">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "F314A31B-972B-4F43-971D-A2FEF3CF1625"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Services App/Presentation/VCs/CategorySelectionViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "149"
-            endingLineNumber = "149"
+            startingLineNumber = "152"
+            endingLineNumber = "152"
             landmarkName = "tableView(_:commit:forRowAt:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -61,9 +50,9 @@
             filePath = "Services App/Presentation/VCs/AllServicesViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "122"
-            endingLineNumber = "122"
-            landmarkName = "tableView(_:cellForRowAt:)"
+            startingLineNumber = "126"
+            endingLineNumber = "126"
+            landmarkName = "tableView(_:didSelectRowAt:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -77,9 +66,248 @@
             filePath = "Services App/Presentation/VCs/AllServicesViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "120"
-            endingLineNumber = "120"
+            startingLineNumber = "124"
+            endingLineNumber = "124"
             landmarkName = "tableView(_:cellForRowAt:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3736B5B7-6EC0-43CB-B0A1-9598FEC9A87E"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Services App/BL/Services/DB/DataService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "179"
+            endingLineNumber = "179"
+            landmarkName = "rememberUser(_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "3736B5B7-6EC0-43CB-B0A1-9598FEC9A87E - edaee6f4edfd56c9"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Services_App.DataService.rememberUser(Services_App.UserModel) throws -&gt; ()"
+                  moduleName = "Services App"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alchwi/Documents/GitHub/services/Services%20App/Services%20App/BL/Services/DB/DataService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "168"
+                  endingLineNumber = "168"
+                  offsetFromSymbolStart = "400">
+               </Location>
+               <Location
+                  uuid = "3736B5B7-6EC0-43CB-B0A1-9598FEC9A87E - 88d60497a0432ac3"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (CoreStore.SynchronousDataTransaction) -&gt; () in Services_App.DataService.rememberUser(Services_App.UserModel) throws -&gt; ()"
+                  moduleName = "Services App"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alchwi/Documents/GitHub/services/Services%20App/Services%20App/BL/Services/DB/DataService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "169"
+                  endingLineNumber = "169"
+                  offsetFromSymbolStart = "156">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "63A04454-27B8-4A04-A4F9-890E7A805AA0"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Services App/BL/Services/DB/DataService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "180"
+            endingLineNumber = "180"
+            landmarkName = "rememberUser(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "FEE5E8F2-188C-4A5B-842F-6036B147E665"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Services App/BL/Services/DB/DataService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "182"
+            endingLineNumber = "182"
+            landmarkName = "rememberUser(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1777E856-97E8-40E0-A880-34C2BD6103C0"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Services App/BL/Services/DB/DBEntities/UserEntity.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "28"
+            endingLineNumber = "28"
+            landmarkName = "find(userId:stack:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "82C7851B-02D2-4A60-9884-45EF1AE3FD4F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Services App/Presentation/VCs/ProfessionSelectionViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "175"
+            endingLineNumber = "175"
+            landmarkName = "filterContentForSearchText(_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "82C7851B-02D2-4A60-9884-45EF1AE3FD4F - 3e15ac2b5eeb52b0"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Services_App.ProfessionSelectionViewController.filterContentForSearchText(Swift.String) -&gt; ()"
+                  moduleName = "Services App"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alchwi/Documents/GitHub/services/Services%20App/Services%20App/Presentation/VCs/ProfessionSelectionViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "173"
+                  endingLineNumber = "173"
+                  offsetFromSymbolStart = "348">
+               </Location>
+               <Location
+                  uuid = "82C7851B-02D2-4A60-9884-45EF1AE3FD4F - c5d403bb92c2fe28"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Services_App.ProfessionEntity) -&gt; Swift.Optional&lt;Services_App.ProfessionModel&gt; in Services_App.ProfessionSelectionViewController.filterContentForSearchText(Swift.String) -&gt; ()"
+                  moduleName = "Services App"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alchwi/Documents/GitHub/services/Services%20App/Services%20App/Presentation/VCs/ProfessionSelectionViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "173"
+                  endingLineNumber = "173"
+                  offsetFromSymbolStart = "30">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9A15EEF0-33B7-4D9D-860A-D1BA30837599"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Services App/Presentation/VCs/OrderedServicesViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "129"
+            endingLineNumber = "129"
+            landmarkName = "refreshOrders()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "9A15EEF0-33B7-4D9D-860A-D1BA30837599 - 6881bee56b6b9d81"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Services_App.OrderedServicesViewController.(refreshOrders in _0412A9945FEDB0940AB87F48FB1F48E5)() -&gt; ()"
+                  moduleName = "Services App"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alchwi/Documents/GitHub/services/Services%20App/Services%20App/Presentation/VCs/OrderedServicesViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "129"
+                  endingLineNumber = "129"
+                  offsetFromSymbolStart = "204">
+               </Location>
+               <Location
+                  uuid = "9A15EEF0-33B7-4D9D-860A-D1BA30837599 - 6881bee56b6b9d81"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Services_App.OrderedServicesViewController.(refreshOrders in _0412A9945FEDB0940AB87F48FB1F48E5)() -&gt; ()"
+                  moduleName = "Services App"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alchwi/Documents/GitHub/services/Services%20App/Services%20App/Presentation/VCs/OrderedServicesViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "129"
+                  endingLineNumber = "129"
+                  offsetFromSymbolStart = "311">
+               </Location>
+               <Location
+                  uuid = "9A15EEF0-33B7-4D9D-860A-D1BA30837599 - 6881bee56b6b9d81"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Services_App.OrderedServicesViewController.(refreshOrders in _0412A9945FEDB0940AB87F48FB1F48E5)() -&gt; ()"
+                  moduleName = "Services App"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alchwi/Documents/GitHub/services/Services%20App/Services%20App/Presentation/VCs/OrderedServicesViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "129"
+                  endingLineNumber = "129"
+                  offsetFromSymbolStart = "2535">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "50BE2F7C-7A7A-487F-A368-6C7F8D36BE80"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Services App/Presentation/Cells/ServiceWithProviderTableViewCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
+            landmarkName = "configure(forService:andProvider:countOfOrders:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "07D05EFC-4C68-4A77-8127-48ECF784F786"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Services App/Application/Coordinators/AppCoordinator.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "105"
+            endingLineNumber = "105"
+            landmarkName = "didFinishEditingUser(withResult:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
