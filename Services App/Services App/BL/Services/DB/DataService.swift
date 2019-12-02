@@ -167,15 +167,10 @@ class DataService {
         return serviceModels ?? []
     }
     
-    func findAllUsers() throws -> [UserModel] {
-        let entities = try UserEntity.findAll(stack: sharedCoreStore)
-        return entities.compactMap { (entity) -> ElementOfResult? in
-            switch entity {
-            case is ClientUser:
-                return ClientModel(fromEntity: <#T##ClientEntity?#>)
-            }
-        }
-    }
+//    func findAllUsers() throws -> [UserModel] {
+//        let entities = try UserEntity.findAll(stack: sharedCoreStore)
+//
+//    }
     
     func findOrders(forUserByID id: UUID, date: Date) throws -> [OrderModel]? {
         let orderEntities = try OrderEntity.find(forUserByID: id, andDate: date, stack: sharedCoreStore)
